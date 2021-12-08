@@ -2,9 +2,9 @@
 /**
  * Open Source Social Network
  *
- * @package Open Source Social Network
- * @author    Open Social Website Core Team <info@softlab24.com>
- * @copyright 2014-2017 SOFTLAB24 LIMITED
+ * @package   Open Source Social Network
+ * @author    Open Social Website Core Team <info@openteknik.com>
+ * @copyright (C) OpenTeknik LLC
  * @license   Open Source Social Network License (OSSN LICENSE)  http://www.opensource-socialnetwork.org/licence
  * @link      https://www.opensource-socialnetwork.org/
  */
@@ -37,6 +37,9 @@ $en = array(
     'privacy:group:close' => 'Everyone can see this group. Only members can post and see posts.',
 
     'group:memb:remove' => 'Remove',
+    'group:memb:make:owner' => 'Make group owner',
+    'group:memb:make:owner:confirm' => 'Attention! This action will make >> %s << the new owner of the group and you will lose all of your group admin privileges. Are you sure to proceed?',
+    'group:memb:make:owner:admin:confirm' => 'Attention! This action will make >> %s << the new owner of the group and the former owner will lose all of his group admin privileges. Are you sure to proceed?',
     'leave:group' => 'Leave Group',
     'join:group' => 'Join Group',
     'total:members' => 'Total Members',
@@ -62,6 +65,11 @@ $en = array(
 	'ossn:group:by' => 'By:',
 	
 	'group:deleted' => 'Group and group contents deleted',
-	'group:delete:fail' => 'Group could not be deleted',	
+	'group:delete:fail' => 'Group could not be deleted',
+
+	'group:delete:cover' => 'Delete Cover',
+	'group:delete:cover:error' => 'An error occurred while deleting the cover image',
+	'group:delete:cover:success' => 'The cover image was successfully deleted',
+
 );
 ossn_register_languages('en', $en); 

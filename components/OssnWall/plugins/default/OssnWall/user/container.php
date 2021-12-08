@@ -2,9 +2,9 @@
 /**
  *    OpenSource-SocialNetwork
  *
- * @package   (softlab24.com).ossn
+ * @package   (openteknik.com).ossn
  * @author    OSSN Core Team <info@opensource-socialnetwork.com>
- * @copyright 2014-2017 SOFTLAB24 LIMITED
+ * @copyright (C) OpenTeknik LLC
  * @license   General Public Licence http://opensource-socialnetwork.com/licence
  * @link      http://www.opensource-socialnetwork.com/licence
  */
@@ -37,7 +37,7 @@
        <i class="fa fa-map-marker"></i>
     </li>
     <li class="ossn-wall-photo">
-       <i class="fa fa-picture-o"></i>
+       <i class="fa fa-image"></i>
     </li>
 	<div style="float:right;">
     	<div class="ossn-loading ossn-hidden"></div>
@@ -45,7 +45,7 @@
 	</div>
     <li class="ossn-wall-privacy">
         <div class="ossn-wall-privacy-lock"></div>
- 		<span><i class="fa fa-lock"></i><span class="hidden-xs"><?php echo ossn_print('privacy'); ?></span></span>
+ 		<span><i class="ossn-wall-privacy-lock fa fa-lock"></i><span class="hidden-xs"><?php echo ossn_print('privacy'); ?></span></span>
 	</li>
 </div>
 <input type="hidden" value="<?php echo $params['user']->guid; ?>" name="wallowner"/>

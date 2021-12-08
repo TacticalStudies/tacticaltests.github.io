@@ -2,9 +2,9 @@
 /**
  * Open Source Social Network
  *
- * @package Open Source Social Network
- * @author    Open Social Website Core Team <info@softlab24.com>
- * @copyright 2014-2017 SOFTLAB24 LIMITED
+ * @package   Open Source Social Network
+ * @author    Open Social Website Core Team <info@openteknik.com>
+ * @copyright (C) OpenTeknik LLC
  * @license   Open Source Social Network License (OSSN LICENSE)  http://www.opensource-socialnetwork.org/licence
  * @link      https://www.opensource-socialnetwork.org/
  */
@@ -89,10 +89,25 @@ function ossn_print($id = '', $args = array()) {
 function ossn_default_load_locales() {
 		global $Ossn;
 		$active = ossn_site_settings('language');
-		if(isset($Ossn->locale[$active])) {
-				foreach($Ossn->locale[$active] as $locales) {
-						if(is_file($locales)) {
-								include_once($locales);
+		if(ossn_site_settings('cache') == 1) {
+				$system_locale_cache = ossn_get_userdata("system/locales/");
+				$cached_locale       = $system_locale_cache . "ossn.{$active}.json";
+				if(file_exists($cached_locale)) {
+						//this includes component language file too
+						//Cache the locale files #1321
+						$cached_locale_array = json_decode(file_get_contents($cached_locale), true);
+						if(!json_last_error()) {
+								$Ossn->localestr[$active] = $cached_locale_array;
+						} else {
+							throw new exception('Can not decode the cached language file');	
+						}
+				}
+		} else {
+				if(isset($Ossn->locale[$active])) {
+						foreach($Ossn->locale[$active] as $locales) {
+								if(is_file($locales)) {
+										include_once($locales);
+								}
 						}
 				}
 		}
@@ -367,12 +382,18 @@ function ossn_standard_language_codes() {
  *
  * @return void
  */
-function ossn_load_available_languages() {
-		$codes = ossn_standard_language_codes();
+function ossn_load_available_languages($language_selection = false) {
+		if(!$language_selection) {
+				$codes = ossn_standard_language_codes();
+		} else {
+				$codes = array();
+				$codes[] = $language_selection;
+		}
 		$path  = ossn_route();
 		
 		$components = new OssnComponents;
-		
+		$themes = new OssnThemes;
+
 		//load core framework languages
 		foreach($codes as $code) {
 				$file = $path->locale . "ossn.{$code}.php";
@@ -381,10 +402,20 @@ function ossn_load_available_languages() {
 				}
 		}
 		//load component languages
-		$components = $components->getActive();
+		$components = $components->getComponents();
 		foreach($components as $component) {
 				foreach($codes as $code) {
-						$file = $path->components . '/' . $component->com_id . "/locale/ossn.{$code}.php";
+						$file = $path->components . '/' . $component . "/locale/ossn.{$code}.php";
+						if(is_file($file)) {
+								include_once($file);
+						}
+				}
+		}
+		//load theme languages
+		$themes = $themes->getThemes();
+		foreach($themes as $theme) {
+				foreach($codes as $code) {
+						$file = $path->themes . $theme . "/locale/ossn.{$code}.php";
 						if(is_file($file)) {
 								include_once($file);
 						}

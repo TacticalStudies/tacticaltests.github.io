@@ -2,9 +2,9 @@
 /**
  * Open Source Social Network
  *
- * @package   (softlab24.com).ossn
- * @author    OSSN Core Team <info@softlab24.com>
- * @copyright 2014-2017 SOFTLAB24 LIMITED
+ * @package   (openteknik.com).ossn
+ * @author    OSSN Core Team <info@openteknik.com>
+ * @copyright (C) OpenTeknik LLC
  * @license   Open Source Social Network License (OSSN LICENSE)  http://www.opensource-socialnetwork.org/licence
  * @link      https://www.opensource-socialnetwork.org/
  */
@@ -21,12 +21,14 @@ function ossn_notifications() {
 		//css
 		ossn_extend_view('css/ossn.default', 'css/notifications');
 		//js
-		ossn_extend_view('js/opensource.socialnetwork', 'js/OssnNotifications');
+		ossn_extend_view('js/ossn.site', 'js/OssnNotifications');
 		
-		//pages
-		ossn_register_page('notification', 'ossn_notification_page');
-		ossn_register_page('notifications', 'ossn_notifications_page');
-		
+		if(ossn_isLoggedin()){
+			ossn_extend_view('ossn/site/head', 'js/notifications-settings');
+			//pages
+			ossn_register_page('notification', 'ossn_notification_page');
+			ossn_register_page('notifications', 'ossn_notifications_page');
+		}
 		//callbacks
 		ossn_register_callback('like', 'created', 'ossn_notification_like');
 		ossn_register_callback('wall', 'post:created', 'ossn_notification_walltag');
@@ -49,13 +51,17 @@ function ossn_notifications() {
 		if(ossn_isLoggedin()) {
 				ossn_extend_view('ossn/js/head', 'notifications/js/autocheck');
 				ossn_register_action('notification/mark/allread', __OSSN_NOTIF__ . 'actions/markread.php');
+				if(ossn_isAdminLoggedin()) {
+						ossn_register_action('notifications/admin/settings', __OSSN_NOTIF__ . 'actions/notifications/admin/settings.php');
+						ossn_register_com_panel('OssnNotifications', 'settings');
+				}
+				ossn_register_sections_menu('newsfeed', array(
+					'name' => 'notifications',
+					'text' => ossn_print('notifications'),
+					'url' => ossn_site_url('notifications/all'),
+					'parent' => 'links',
+				));		
 		}
-		ossn_register_sections_menu('newsfeed', array(
-				'name' => 'notifications',
-				'text' => ossn_print('notifications'),
-				'url' => ossn_site_url('notifications/all'),
-				'parent' => 'links',
-		));		
 }
 /**
  * Create a notification for annotation like
@@ -107,8 +113,7 @@ function ossn_notification_page($pages) {
 						break;
 				case 'friends':
 						$friends['friends'] = ossn_loggedin_user()->getFriendRequests();
-						$friends_count      = count($friends['friends']);
-						if($friends_count > 0 && !empty($friends['friends'])) {
+						if(!empty($friends['friends'])) {
 								$data = ossn_plugin_view('notifications/pages/notification/friends', $friends);
 								echo json_encode(array(
 										'type' => 1,
@@ -125,8 +130,8 @@ function ossn_notification_page($pages) {
 				case 'messages':
 						$OssnMessages     = new OssnMessages;
 						$params['recent'] = $OssnMessages->recentChat(ossn_loggedin_user()->guid);
-						$data             = ossn_plugin_view('messages/templates/message-with-notifi', $params);
 						if(!empty($params['recent'])) {
+								$data = ossn_plugin_view('messages/templates/message-with-notifi', $params);
 								echo json_encode(array(
 										'type' => 1,
 										'data' => $data
@@ -163,13 +168,15 @@ function ossn_notification_page($pages) {
 						if(class_exists('OssnMessages')) {
 								$messages       = new OssnMessages;
 								$count_messages = $messages->countUNREAD(ossn_loggedin_user()->guid);
+						} else {
+								$count_messages = 0;
 						}
 						if(!$count_notif) {
 								$count_notif = 0;
 						}
 						$friends   = ossn_loggedin_user()->getFriendRequests();
 						$friends_c = 0;
-						if(count($friends) > 0 && !empty($friends)) {
+						if($friends) {
 								$friends_c = count($friends);
 						}
 						echo json_encode(array(
@@ -234,9 +241,10 @@ function ossn_notification_walltag($type, $ctype, $params) {
 		$notification = new OssnNotifications;
 		if(isset($params['friends']) && is_array($params['friends'])) {
 				foreach($params['friends'] as $friend) {
-						if(!empty($params['poster_guid']) && !empty($params['subject_guid']) && !empty($friend)) {
-								$notification->add('wall:friends:tag', $params['poster_guid'], $params['subject_guid'], NULL, $friend);
-						}
+						//Tagging friend in wall isn't working #1511
+						//user object guid instead of itemguid
+						if(!empty($params['poster_guid']) && !empty($params['object_guid']) && !empty($friend)) {
+								$notification->add('wall:friends:tag', $params['poster_guid'], $params['object_guid'], $params['object_guid'], $friend);						}
 				}
 		}
 }
@@ -350,6 +358,8 @@ function ossn_notificaiton_like_annotation_hook($hook, $type, $return, $params) 
 		
 		$annotation = $annotation->getAnnotationById();
 		if($annotation) {
+				//[E] refine the like:annotation notification type: #1868
+				$params['type'] = "like:annotation:{$annotation->type}";
 				$params['owner_guid']   = $annotation->owner_guid;
 				$params['subject_guid'] = $annotation->subject_guid;
 				return $params;

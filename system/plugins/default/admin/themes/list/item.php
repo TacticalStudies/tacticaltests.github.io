@@ -2,9 +2,9 @@
 /**
  * Open Source Social Network
  *
- * @package   (softlab24.com).ossn
- * @author    OSSN Core Team <info@softlab24.com>
- * @copyright 2014-2017 SOFTLAB24 LIMITED
+ * @package   (openteknik.com).ossn
+ * @author    OSSN Core Team <info@openteknik.com>
+ * @copyright (C) OpenTeknik LLC
  * @license   Open Source Social Network License (OSSN LICENSE)  http://www.opensource-socialnetwork.org/licence
  * @link      https://www.opensource-socialnetwork.org/
  */
@@ -16,32 +16,32 @@
  $id = $params['id'];
  $requirements = $themes->checkRequirments($params['theme']);
  
+ $enable = '';
+ $delete = '';
  if(ossn_site_settings('theme') !== $id) {
-      $enable = ossn_site_url("action/theme/enable?theme={$id}", true);
-	  $enable = "<a href='{$enable}' class='btn btn-success'><i class='fa fa-check'></i>".ossn_print('admin:button:enable')."</a>";
+	 $enable = ossn_site_url("action/theme/enable?theme={$id}", true);
+	 $enable = "<a href='{$enable}' class='btn btn-success'><i class='fa fa-check'></i>".ossn_print('admin:button:enable')."</a>";
 
-	  $delete = ossn_site_url("action/theme/delete?theme={$id}", true);
-	  $delete = "<a href='{$delete}' class='btn btn-danger'><i class='fa fa-close'></i>".ossn_print('admin:button:delete')."</a>";	  
+	 $delete = ossn_site_url("action/theme/delete?theme={$id}", true);
+	 $delete = "<a href='{$delete}' class='btn btn-danger ossn-make-sure'><i class='fa fa-close'></i>".ossn_print('admin:button:delete')."</a>";	  
  } 
 ?> 	
-    <div class="panel panel-default margin-top-10">
-      <div class="panel-heading">
-        <h4 class="panel-title">
-          <a data-parent="#accordion" href="#collapse-<?php echo $translit;?>" data-toggle="collapse">
-		  	<?php echo $params['theme']->name;?> <?php echo $params['theme']->version;?> <i class="fa fa-sort-desc"></i>
+    <div class="card card-spacing">
+      <div class="card-header">
+          <a data-parent="#accordion" href="#collapse-<?php echo $translit;?>" data-bs-toggle="collapse">
+		  	<?php echo $params['theme']->name;?> <?php echo $params['theme']->version;?> <i class="fa fa-sort-down"></i>
           </a>
           <div class="right">
           
           <?php if (ossn_site_settings('theme') == $id){ ?>
            		<i title="<?php echo ossn_print('admin:button:enabled');?>" class="component-title-icon component-title-check fa fa-check-circle"></i>           
           <?php } else {?>
-           		<i title="<?php echo ossn_print('admin:button:disabled');?>" class="component-title-icon component-title-delete fa fa-times-circle-o"></i>         
+           		<i title="<?php echo ossn_print('admin:button:disabled');?>" class="component-title-icon component-title-delete fa fa-times-circle"></i>         
 		  <?php } ?>
           </div>
-        </h4>
       </div>
-      <div id="collapse-<?php echo $translit;?>" class="panel-collapse collapse">
-        <div class="panel-body">
+      <div id="collapse-<?php echo $translit;?>" class="collapse">
+        <div class="card-body">
 			<p><?php echo $params['theme']->description;?></p>
             <?php 
 			if(!$themes->isOld($params['theme'])){
@@ -69,8 +69,8 @@
                     	<table class="table">
                         	<tr class="table-titles">
                             	<th><?php echo ossn_print('name');?></th>
-                            	<th><?php echo ossn_print('admin:com:version');?></th>
-                                <th><?php echo ossn_print('admin:com:availability');?></th>
+                            	<th><?php echo ossn_print('admin:com:requirement');?></th>
+                                <th><?php echo ossn_print('admin:com:fulfilled');?></th>
                             </tr>
                             <?php
 							if($requirements){ 
@@ -79,7 +79,7 @@
 									if($item['availability'] == 0){
 										$check = false;
 									}
-									$icon = 'component-title-delete fa fa-times-circle-o';
+									$icon = 'component-title-delete fa fa-times-circle';
 									if($item['availability'] == 1){
 											$icon = 'component-title-check fa fa-check-circle';
 									}

@@ -2,9 +2,9 @@
 /**
  * Open Source Social Network
  *
- * @package   (softlab24.com).ossn
- * @author    OSSN Core Team <info@softlab24.com>
- * @copyright 2014-2017 SOFTLAB24 LIMITED
+ * @package   (openteknik.com).ossn
+ * @author    OSSN Core Team <info@openteknik.com>
+ * @copyright (C) OpenTeknik LLC
  * @license   Open Source Social Network License (OSSN LICENSE)  http://www.opensource-socialnetwork.org/licence
  * @link      https://www.opensource-socialnetwork.org/
  */
@@ -29,7 +29,7 @@ $img = str_replace('profile/cover/', '', $image->value);
 <?php
 	$vars['entity'] = $image;
 	$vars['full_view'] = true;
-	echo ossn_plugin_view('entity/comment/like/share/view', $params);
+	echo ossn_plugin_view('entity/comment/like/share/view', $vars);
 ?>
 <div class="ossn-photo-view-controls">
     <?php

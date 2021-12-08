@@ -2,9 +2,9 @@
 /**
  * Open Source Social Network
  *
- * @package   (softlab24.com).ossn
- * @author    OSSN Core Team <info@softlab24.com>
- * @copyright 2014-2017 SOFTLAB24 LIMITED
+ * @package   (openteknik.com).ossn
+ * @author    OSSN Core Team <info@openteknik.com>
+ * @copyright (C) OpenTeknik LLC
  * @license   Open Source Social Network License (OSSN LICENSE)  http://www.opensource-socialnetwork.org/licence
  * @link      https://www.opensource-socialnetwork.org/
  */
@@ -30,18 +30,25 @@ function ossn_goblue_theme_init(){
 	ossn_extend_view('ossn/admin/head', 'ossn_goblue_admin_head');
 	ossn_extend_view('ossn/site/head', 'ossn_goblue_head');
     ossn_extend_view('js/opensource.socialnetwork', 'js/goblue');	
+	
+	ossn_register_admin_sidemenu('admin:theme:goblue', 'admin:theme:goblue', ossn_site_url('administrator/settings/goblue'), ossn_print('admin:sidemenu:themes'));
+	ossn_register_site_settings_page('goblue', 'settings/admin/goblue');
+	
+	if(ossn_isAdminLoggedin()) {
+		ossn_register_action('goblue/settings', __THEMEDIR__ . 'actions/settings.php');
+	}	
 }
 function ossn_goblue_head(){
 	$head	 = array();
 	
 	$head[]  = ossn_html_css(array(
-					'href' => '//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css'
+					'href' => '//cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css',
 			  ));	
 	$head[]  = ossn_html_css(array(
 					'href' =>  'https://fonts.googleapis.com/css?family=PT+Sans:400italic,700,400'
 			  ));		
 	$head[]  = ossn_html_js(array(
-					'src' => ossn_theme_url() . 'vendors/bootstrap/js/bootstrap.min.js'
+					'src' => ossn_theme_url() . 'vendors/bootstrap/js/bootstrap.min.js?v5'
 			  ));
 	$head[]  = ossn_html_css(array(
 					'href' => '//cdnjs.cloudflare.com/ajax/libs/jqueryui/1.10.4/css/jquery-ui.css'
@@ -51,13 +58,13 @@ function ossn_goblue_head(){
 function ossn_goblue_admin_head(){
 	$head	 = array();	
 	$head[]  = ossn_html_css(array(
-					'href' => '//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css'
+					'href' => '//cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css',
 			  ));	
 	$head[]  = ossn_html_css(array(
 					'href' =>  '//fonts.googleapis.com/css?family=Roboto+Slab:300,700,400'
 			  ));		
 	$head[]  = ossn_html_js(array(
-					'src' => ossn_theme_url() . 'vendors/bootstrap/js/bootstrap.min.js'
+					'src' => ossn_theme_url() . 'vendors/bootstrap/js/bootstrap.min.js?v5'
 			  ));
 	$head[]  = ossn_html_css(array(
 					'href' => '//cdnjs.cloudflare.com/ajax/libs/jqueryui/1.10.4/css/jquery-ui.css'

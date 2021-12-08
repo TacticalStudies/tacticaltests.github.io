@@ -6,12 +6,13 @@
     float: right;
     position: relative;
     margin-right: 5px;
-    margin-top: 5px;
+    margin-top: 4px;
     width: 25px;
     height: 25px;
     padding: 5px;
-    z-index: 2;
+    font-size:16px;
     cursor:pointer;
+    color:#999;
 }
 .ossn-comment-attachment {
     width: 115px;
@@ -68,4 +69,9 @@
 }
 .ossn-delete-comment {
     color: #EC2020 !important;
+}
+.comment-post-btn {
+    float: right;
+    border-radius: 10px;
+    padding: 2px 20px;
 }

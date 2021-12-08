@@ -68,12 +68,12 @@ img.ustatus.ossn-chat-icon-online {
 }
 
 .ossn-chat-tab-titles {
-    background: #186DF2;
+    background: #0b769c;
     color: #fff;
-    padding: 5px;
-    border: 1px solid #186DF2;
-    border-top-left-radius: 2px;
-    border-top-right-radius: 2px;
+    padding: 3px;
+    border: 1px solid #086c90;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
 }
 
 .ossn-chat-inline-table {
@@ -97,8 +97,8 @@ img.ustatus.ossn-chat-icon-online {
 }
 
 .ossn-chat-tab-titles:hover {
-    background: #1b60ce;
-    border:1px solid #1b60ce;
+    background: #086c90;
+    border: 1px solid #0b769c;
 }
 
 .ossn-chat-tab-titles .text {
@@ -166,6 +166,10 @@ img.ustatus.ossn-chat-icon-online {
     float: right;
 }
 
+.friend-tab-item:first-child {
+	margin-right: 75px;
+}
+
 .friend-tab-item .friend-tab {
     padding: 12px;
     margin-left: 5px;
@@ -198,7 +202,7 @@ img.ustatus.ossn-chat-icon-online {
     border-left: 1px solid #ccc;
     border-right: 1px solid #ccc;
     width: 251px;
-    height: 237px;
+    height: 238px;
     overflow: hidden;
     overflow-y: scroll;
 }
@@ -365,9 +369,9 @@ img.ustatus.ossn-chat-icon-online {
 .ossn-chat-icon {}
 .ossn-chat-icon-online:before {
 	content: "\f111 ";
-    font-family: FontAwesome;
+    font-family: 'Font Awesome 5 Free';
     font-style: normal;
-    font-weight: normal;
+    font-weight: 900;
     color: #57B540;
     font-size: 12px;
     float: left;
@@ -375,18 +379,18 @@ img.ustatus.ossn-chat-icon-online {
 
 .ossn-chat-icon-offline:before {
 	content: "\f111 ";
-    font-family: FontAwesome;
+    font-family: 'Font Awesome 5 Free';
     font-style: normal;
-    font-weight: normal;
+    font-weight: 900;
     color: #D23636;
     font-size: 12px;
     float: left;
 }
 .ossn-chat-icon-expend:before {
     content: "\f0b2";
-    font-family: FontAwesome;
+    font-family: 'Font Awesome 5 Free';
     font-style: normal;
-    font-weight: normal;
+    font-weight: 900;
     color: #fff;
     font-size: 12px;
 }
@@ -397,9 +401,9 @@ img.ustatus.ossn-chat-icon-online {
 
 .ossn-chat-icon-smile:before {
     content: "\f118";
-    font-family: FontAwesome;
+    font-family: 'Font Awesome 5 Free';
     font-style: normal;
-    font-weight: normal;
+    font-weight: 400;
     font-size: 16px;
     margin-left: 10px;
 }
@@ -417,6 +421,12 @@ img.ustatus.ossn-chat-icon-online {
 and (min-width : 1280px) {
     .ossn-chat-base {
         width: 910px !important;
+    }
+}
+
+@media only screen and (min-width : 1500px) {
+    .ossn-chat-base {
+        width: 1100px !important;
     }
 }
 
@@ -486,9 +496,9 @@ and (min-width : 1360px) {
  	margin-right:4px;
     	margin-top: -17px;
  	content: "\f111 ";
-    	font-family: FontAwesome;
+    	font-family: 'Font Awesome 5 Free';
     	font-style: normal;
-    	font-weight: normal;
+    	font-weight: 900;
     	color: #57B540;
     	font-size: 12px;
     }
@@ -541,4 +551,10 @@ footer {
 }
 @-ms-viewport {
    width: auto;
+}
+.friend-tab-item .container-table-pagination {
+   	visibility:hidden;
+}
+.friend-tab-item .pagination {
+	margin:0;
 }

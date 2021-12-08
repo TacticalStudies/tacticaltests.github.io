@@ -2,13 +2,13 @@
 /**
  * Open Source Social Network
  *
- * @package   (softlab24.com).ossn
- * @author    OSSN Core Team <info@softlab24.com>
- * @copyright 2014-2017 SOFTLAB24 LIMITED
+ * @package   (openteknik.com).ossn
+ * @author    OSSN Core Team <info@openteknik.com>
+ * @copyright (C) OpenTeknik LLC
  * @license   Open Source Social Network License (OSSN LICENSE)  http://www.opensource-socialnetwork.org/licence
  * @link      https://www.opensource-socialnetwork.org/
  */
-
+global $VIEW;
 $VIEW = new stdClass;
 $VIEW->register = array();
 
@@ -81,7 +81,7 @@ function ossn_args(array $attrs) {
  * Register a view;
  *
  * @param string $view Path of view;
- * @param  stringn $file File name for view;
+ * @param string|callable $file File name for view;
  * @last edit: $arsalanshah
  *
  * @reason: Initial;
@@ -107,7 +107,7 @@ function ossn_fetch_extend_views($layout, $params = array()) {
     global $VIEW;
     if (isset($VIEW->register[$layout]) && !empty($VIEW->register[$layout])) {
         foreach ($VIEW->register[$layout] as $file) {
-            if (!function_exists($file)) {
+            if (!is_callable($file)) {
                 $fetch[] = ossn_plugin_view($file, $params);
             } else {
                 $fetch[] = call_user_func($file, ossn_get_context(), $params, current_url());
@@ -188,8 +188,9 @@ function ossn_get_context() {
  */
 function ossn_set_page_layout($layout, $params = array()) {
     if (!empty($layout)) {
-        $theme = new OssnThemes;
-        $active_theme = $theme->getActive();
+        //unused variabled removed below $arsalanshah
+		//$theme = new OssnThemes;
+        //$active_theme = $theme->getActive();
         return ossn_plugin_view("theme/page/layout/{$layout}", $params);
     }
 }
@@ -221,11 +222,13 @@ function ossn_default_theme() {
 /**
  * Activated theme URL
  *
+ * @param string $extend Extend the theme url with extra url param (path to file etc)
+ *
  * @return string
  */
-function ossn_theme_url(){
+function ossn_theme_url($extend = ''){
 	$default = ossn_site_settings('theme');
-	return ossn_site_url("themes/{$default}/");
+	return ossn_site_url("themes/{$default}/{$extend}");
 }
 /**
  * Ossn view form
@@ -250,29 +253,15 @@ function ossn_view_widget(array $params = array()) {
     return ossn_plugin_view("widget/view", $params);
 }
 /**
- * View a template
- *
- * Use a templates from core (image view, url view etc)
- * 
- * @param string $template A name of template
- * @param array $params
- * 
- * @return mix data
- */
-function ossn_view_template($template = '', array $params){
-	if(!empty($template)){
-		return ossn_plugin_view("{$template}", $params);
-	}
-}
-/**
  * Create a pagiantion using count and page limit
  *
  * @param integer $count total entities/objects
  * @param integer $page_limit Number of entities/objects per page
+ * @param array   $args Overwrite the default behaviour of pagination view
  *
  * @return false|mixed data
  */
-function ossn_view_pagination($count = false, $page_limit = 10){
+function ossn_view_pagination($count = false, $page_limit = 10, array $args = array()){
 	$page_limit = ossn_call_hook('pagination', 'page_limit', false, $page_limit);
 	if(!empty($count) && !empty($page_limit)){
 		$pagination = new OssnPagination;
@@ -281,10 +270,14 @@ function ossn_view_pagination($count = false, $page_limit = 10){
 		$params['limit'] = $count;
 		$params['page_limit']  = $page_limit;
 		
-		$offset = input('offset');
-		if(empty($offset)){
-			ossn_set_input('offset', 1);
+		if(!isset($args['offset_name']) || empty($args['offset_name'])){
+				$args['offset_name'] = 'offset';
 		}
+		$offset = input($args['offset_name']);
+		if(empty($offset)){
+			ossn_set_input($args['offset_name'], 1);
+		}
+		$params['options'] = $args;
 		return $pagination->pagination($params);
 	}
 	return false;

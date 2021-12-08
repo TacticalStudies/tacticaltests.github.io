@@ -2,9 +2,9 @@
 /**
  * Open Source Social Network
  *
- * @package Open Source Social Network
- * @author    Open Social Website Core Team <info@softlab24.com>
- * @copyright 2014-2017 SOFTLAB24 LIMITED
+ * @package   Open Source Social Network
+ * @author    Open Social Website Core Team <info@openteknik.com>
+ * @copyright (C) OpenTeknik LLC
  * @license   Open Source Social Network License (OSSN LICENSE)  http://www.opensource-socialnetwork.org/licence
  * @link      https://www.opensource-socialnetwork.org/
  */
@@ -26,13 +26,14 @@ function ossn_wall() {
 				ossn_register_action('wall/post/g', __OSSN_WALL__ . 'actions/wall/post/group.php');
 				ossn_register_action('wall/post/delete', __OSSN_WALL__ . 'actions/wall/post/delete.php');
 				ossn_register_action('wall/post/edit', __OSSN_WALL__ . 'actions/wall/post/edit.php');
+				ossn_register_action('wall/post/embed', __OSSN_WALL__ . 'actions/wall/post/embed.php');
 		}
 		if(ossn_isAdminLoggedin()) {
 				ossn_register_action('wall/admin/settings', __OSSN_WALL__ . 'actions/wall/admin/settings.php');
 		}
 		//css and js
 		ossn_extend_view('css/ossn.default', 'css/wall');
-		ossn_extend_view('js/opensource.socialnetwork', 'js/ossn_wall');
+		ossn_extend_view('js/ossn.site', 'js/ossn_wall');
 		
 		ossn_new_external_js('jquery.tokeninput', 'vendors/jquery/jquery.tokeninput.js');
 		
@@ -64,7 +65,7 @@ function ossn_wall() {
 		
 		$menupost = array(
 				'name' => 'post',
-				'text' => '<i class="fa fa-bullhorn"></i>'.ossn_print('post'),
+				'text' => '<i class="fa fa-bullhorn"><span>'.ossn_print('post').'</span></i>',
 				'href' => ossn_site_url()
 		);
 		$container_controls = array(
@@ -76,12 +77,12 @@ function ossn_wall() {
 			array(
 				'name' => 'location',
 				'class' => 'ossn-wall-location',
-				'text' => '<i class="fa fa-map-marker"></i>',
+				'text' => '<i class="fa fa-map-marker-alt"></i>',
 			),
 			array(
 				'name' => 'photo',
 				'class' => 'ossn-wall-photo',
-				'text' => '<i class="fa fa-picture-o"></i>',
+				'text' => '<i class="fa fa-image"></i>',
 			),			
 		);		
 		ossn_register_menu_item('wall/container/home', $menupost);		
@@ -112,7 +113,7 @@ function ossn_friend_picker() {
 		if(!$friends) {
 				return false;
 		}
-		$search_for = $_GET['q'];
+		$search_for = input('q');
 		// allow case insensitivity with first typed in char
 		$fc = mb_strtoupper(mb_substr($search_for, 0, 1,'UTF-8'), 'UTF-8');
 		$search_For = $fc . mb_substr($search_for, 1, null, 'UTF-8');
@@ -123,13 +124,15 @@ function ossn_friend_picker() {
 		}
 		$search_len = mb_strlen($search_for,'UTF-8');
 		foreach($friends as $users) {
-			$first_name_start = mb_substr($users->first_name, 0, $search_len, 'UTF-8');
-			if($first_name_start == $search_for || $first_name_start == $search_For) {
-				$p['first_name'] = $users->first_name;
-				$p['last_name']  = $users->last_name;
-				$p['imageurl']   = ossn_site_url("avatar/{$users->username}/smaller");
-				$p['id']         = $users->guid;
-				$usera[]         = $p;
+			if(isset($users->guid) && !empty($users->guid)){
+				$first_name_start = mb_substr($users->first_name, 0, $search_len, 'UTF-8');
+				if($first_name_start == $search_for || $first_name_start == $search_For) {
+					$p['first_name'] = $users->first_name;
+					$p['last_name']  = $users->last_name;
+					$p['imageurl']   = ossn_site_url("avatar/{$users->username}/smaller");
+					$p['id']         = $users->guid;
+					$usera[]         = $p;
+				}
 			}
 		}
 		echo json_encode($usera);
@@ -245,6 +248,22 @@ function ossn_post_page($pages) {
 						if(empty($post->guid) || empty($pages[1])) {
 								ossn_error_page();
 						}
+						$loggedin =  ossn_loggedin_user();
+						//Posts having friends privacy are visible to public using direct URL #1484
+						//re-opened on 27-06-2021 thanks to Haydar Alkaduhimi for reporting it.
+						//fixing again on 18-09-2021 user can not view own post.
+						if( (isset($post->access) && $post->access == OSSN_FRIENDS && !ossn_isLoggedin()) || (ossn_isLoggedin() && $loggedin->guid != $post->poster_guid && $post->access == OSSN_FRIENDS && ossn_isLoggedin() && !ossn_user_is_friend($loggedin->guid, $post->poster_guid)) ){
+								ossn_error_page();	
+						}			
+						//[B] Close group post is accessible when not loggedin #1997
+						if($post->type == 'group' && com_is_active('OssnGroups')){
+								$group = ossn_get_group_by_guid($post->owner_guid);
+								if($group && $group->membership == OSSN_PRIVATE){
+										if(ossn_isLoggedin() && !$group->isMember($group->guid, $loggedin->guid) || !ossn_isLoggedin()){
+												ossn_error_page();	
+										}
+								}
+						}
 						$params['post'] = $post;
 						
 						$contents = array(
@@ -313,6 +332,7 @@ function ossn_post_page($pages) {
 										'title' => ossn_print('edit'),
 										'contents' => ossn_view_form('post/edit', array(
 												'action' => ossn_site_url('action/wall/post/edit'),
+												'id' => 'ossn-post-edit-form',
 												'component' => 'OssnWall',
 												'params' => array(
 														'post' => $post
@@ -343,9 +363,9 @@ function ossn_post_page($pages) {
 function ossn_wall_post_menu($hook, $type, $return, $params) {
 		$user = ossn_loggedin_user();
 		if($params['post']->type == 'group') {
-				$group = ossn_get_object($params['post']->owner_guid);
+				$group = ossn_get_group_by_guid($params['post']->owner_guid);
 		}
-		if($params['post']->poster_guid == ossn_loggedin_user()->guid || $params['post']->owner_guid == $user->guid || (isset($group) && $group->owner_guid == $user->guid) || $user->canModerate()) {
+		if($params['post']->poster_guid == ossn_loggedin_user()->guid || $params['post']->owner_guid == $user->guid || (isset($group) && ($group->owner_guid == $user->guid || $group->isModerator($user->guid))) || $user->canModerate()) {
 				
 				$deleteurl = ossn_site_url("action/wall/post/delete?post={$params['post']->guid}", true);
 				
@@ -361,7 +381,7 @@ function ossn_wall_post_menu($hook, $type, $return, $params) {
 		} else {
 				ossn_unregister_menu("delete", 'wallpost');
 		}
-		if(($params['post']->poster_guid == ossn_loggedin_user()->guid || ossn_isAdminLoggedin()) && !isset($params['post']->item_guid)) {
+		if(($params['post']->poster_guid == ossn_loggedin_user()->guid || ossn_isAdminLoggedin()) && empty($params['post']->item_guid)) {
 				ossn_unregister_menu('edit', 'wallpost');
 				ossn_register_menu_item("wallpost", array(
 						'name' => 'edit',
@@ -422,6 +442,20 @@ function ossn_user_posts_delete($callback, $type, $params) {
 				$wall->deletePost($item->guid);
 			}
 		}
+		//Deleting user didn't delete users wall posts if wall poster_guid is not same user as deleted #1505
+		if(!empty($params['entity']->guid)){
+			$posts_by_owner_guid = $wall->searchObject(array(
+							'type' => 'user',
+							'subtype' => 'wall',
+							'owner_guid' => $params['entity']->guid,
+							'page_limit' => false,
+			));
+			if($posts_by_owner_guid){
+					foreach($posts_by_owner_guid as $posti){
+						$posti->deletePost($posti->guid);	
+					}
+			}
+		}
 }
 /**
  * Encode unecaped unicode characters
@@ -445,7 +479,7 @@ function ossn_wall_view_template(array $params = array()) {
 			return false;
 		}
 		$type = $params['post']->type;
-		if(isset($params['post']->item_type)) {
+		if(isset($params['post']->item_type) && !empty($params['post']->item_type)) {
 				$type = $params['post']->item_type;
 		}
 		if(ossn_is_hook('wall:template', $type)) {
@@ -530,8 +564,11 @@ function ossn_wallpost_to_item($post) {
 				if(!isset($post->poster_guid)) {
 						$post = ossn_get_object($post->guid);
 				}
-				$data     = json_decode(html_entity_decode($post->description));
-				$text     = ossn_restore_new_lines($data->post, true);
+				$data = json_decode(html_entity_decode($post->description));
+				$text = '';
+				if($data){
+					$text     = ossn_restore_new_lines($data->post, true);
+				}
 				$location = '';
 				
 				if(isset($data->location)) {
@@ -544,6 +581,12 @@ function ossn_wallpost_to_item($post) {
 				}
 				
 				$user = ossn_user_by_guid($post->poster_guid);
+				if(!isset($data->friend)){
+					if(!$data){
+						$data = new stdClass();	
+					}
+					$data->friend = "";	
+				}
 				return array(
 						'post' => $post,
 						'friends' => explode(',', $data->friend),

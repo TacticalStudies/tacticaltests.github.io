@@ -2,14 +2,18 @@
 /**
  * Open Source Social Network
  *
- * @package Open Source Social Network
- * @author    Open Social Website Core Team <info@softlab24.com>
- * @copyright 2014-2017 SOFTLAB24 LIMITED
+ * @package   Open Source Social Network
+ * @author    Open Social Website Core Team <info@openteknik.com>
+ * @copyright (C) OpenTeknik LLC
  * @license   Open Source Social Network License (OSSN LICENSE)  http://www.opensource-socialnetwork.org/licence
  * @link      https://www.opensource-socialnetwork.org/
  */
 $ads = new OssnAds;
-$ads = $ads->getAds();
+$ads = $ads->getAds(
+	array (
+		'offset' => 1
+	)
+);
 if ($ads) {
 	echo '<div class="ossn-ads">';
         foreach ($ads as $ad) {

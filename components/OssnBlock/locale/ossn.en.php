@@ -2,9 +2,9 @@
 /**
  * Open Source Social Network
  *
- * @package Open Source Social Network
- * @author    Open Social Website Core Team <info@softlab24.com>
- * @copyright 2014-2017 SOFTLAB24 LIMITED
+ * @package   Open Source Social Network
+ * @author    Open Social Website Core Team <info@openteknik.com>
+ * @copyright (C) OpenTeknik LLC
  * @license   Open Source Social Network License (OSSN LICENSE)  http://www.opensource-socialnetwork.org/licence
  * @link      https://www.opensource-socialnetwork.org/
  */
@@ -17,5 +17,7 @@ $en = array(
     'user:unblock:error' => 'Can not unblock user',
     'ossn:blocked:error' => 'Blocked',
     'ossn:blocked:error:note' => 'You can not view this page because you have been blocked by the user.',
+	'ossn:profile:edit:tab' => 'Blocking',
+	'ossn:profile:list:text' => 'This page contains the list of people you blocked.',
 );
 ossn_register_languages('en', $en); 

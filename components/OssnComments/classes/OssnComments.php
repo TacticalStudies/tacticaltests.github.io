@@ -2,9 +2,9 @@
 /**
  * Open Source Social Network
  *
- * @package   (softlab24.com).ossn
- * @author    OSSN Core Team <info@softlab24.com>
- * @copyright 2014-2017 SOFTLAB24 LIMITED
+ * @package   (openteknik.com).ossn
+ * @author    OSSN Core Team <info@openteknik.com>
+ * @copyright (C) OpenTeknik LLC
  * @license   Open Source Social Network License (OSSN LICENSE)  http://www.opensource-socialnetwork.org/licence
  * @link      https://www.opensource-socialnetwork.org/
  */
@@ -12,12 +12,13 @@ class OssnComments extends OssnAnnotation {
 		/**
 		 * Get a comment type from object
 		 *
-		 * @return string;
+		 * @return string
 		 */
 		public static function getType($object) {
 				$type = array(
-						"comments:post" => 'post',
-						"comments:entity" => 'entity'
+						"comments:post" => 'post', // <- this is actually object
+						"comments:entity" => 'entity',
+						"comments:object" => 'object',
 				);
 				return $type[$object];
 		}
@@ -25,19 +26,43 @@ class OssnComments extends OssnAnnotation {
 		/**
 		 * Post Comment
 		 *
-		 * @params $subject_id: Id of item on which user comment
-		 *         $guid: User id
-		 *         $comment: Comment
-		 *         $type: Post or Entity
+		 * @param integer $subject_id Id of item on which user comment
+		 * @param integer $guid User id
+		 * @param string $comment Comment
+		 * @param string $type Post or Entity
 		 *
-		 * @return bool;
+		 * @return boolean|integer
 		 */
 		public function PostComment($subject_id, $guid, $comment, $type = 'post') {
 				if(empty($subject_id) || empty($guid)) {
 						return false;
 				}
+				//[B]comment is added if the post/entity has been deleted already #1645
+				//renewed for objects also
+				if($type == 'post' || $type == 'object') {
+						$postc = ossn_get_object($subject_id);
+						if(!$postc) {
+								return false;
+						}
+						ossn_trigger_callback('comment', 'before:created', array(
+									'type' => $type,
+									'object' => $postc,
+						));						
+				}
+				
+				if($type == 'entity') {
+						$entityc = ossn_get_entity($subject_id);
+						if(!$entityc) {
+								return false;
+						}
+						ossn_trigger_callback('comment', 'before:created', array(
+									'type' => 'entity',
+									'entity' => $entityc,
+						));
+				}
+				
 				$cancomment = false;
-				if(!empty($comment)) {
+				if(strlen($comment)) {
 						$cancomment = true;
 				}
 				if(!empty($this->comment_image)) {
@@ -68,6 +93,7 @@ class OssnComments extends OssnAnnotation {
 										'jpg',
 										'png',
 										'jpeg',
+										'jfif',
 										'gif'
 								));
 								$file->owner_guid = $this->getAnnotationId();
@@ -91,17 +117,17 @@ class OssnComments extends OssnAnnotation {
 		/**
 		 * Get Comment
 		 *
-		 * @params $id: Comment Id
+		 * @param integer $id Comment Id
 		 *
-		 * @return object;
+		 * @return boolean|object
 		 */
 		public function GetComment($id) {
 				if(empty($id)){
-					return false;
+						return false;
 				}
 				$res_array = $this->searchAnnotation(array(
 						'annotation_id' => $id,
-						'offset' => input('comments_offset', '', 1),
+						'offset' => input('comments_offset', '', 1)
 				));
 				return $res_array[0];
 		}
@@ -109,10 +135,10 @@ class OssnComments extends OssnAnnotation {
 		/**
 		 * Count Total Comments on Subject
 		 *
-		 * @params $subject_id: Subject id
-		 *         $type: Comments type
+		 * @param integer $subject_id Subject id
+		 * @param string  $type Comments type
 		 *
-		 * @return int;
+		 * @return integer
 		 */
 		public function countComments($subject_id, $type = 'post') {
 				$this->subject_guid = $subject_id;
@@ -128,24 +154,37 @@ class OssnComments extends OssnAnnotation {
 		/**
 		 * Get Comments
 		 *
-		 * @params $subject_id: Id of item on which users comment
-		 *         $type: Post or Entity
+		 * @param integer $subject_id Id of item on which users comment
+		 * @param integer $type Post or Entity
+		 * @param integer $filter Show filterd comments (blocked users don't see each other)
 		 *
-		 * @return object;
+		 * @return boolean|array
 		 */
-		public function GetComments($subject, $type = 'post') {
+		public function GetComments($subject, $type = 'post', $filter = true){
+				if(empty($subject)){
+					return false;	
+				}
 				$vars                 = array();
 				$vars['subject_guid'] = $subject;
 				$vars['type']         = "comments:{$type}";
 				$vars['order_by']     = 'a.id DESC';
-				$vars['limit']        = $this->limit;
+				if(isset($this->limit)){
+					$vars['limit']        = $this->limit;
+				}
 				if(!isset($this->page_limit) || $this->page_limit === false) {
-					$vars['page_limit'] = false;
+						$vars['page_limit'] = false;
+				} else {
+						$vars['page_limit'] = $this->page_limit;
 				}
-				else {
-					$vars['page_limit'] = $this->page_limit;
+				$extra_param = array(
+						'type' => $type,
+				);
+				if($filter === true){
+					$attrs   = ossn_call_hook('comments', 'GetComments', $extra_param, $vars);
+					$comments = $this->searchAnnotation($attrs);
+				} else {
+					$comments = $this->searchAnnotation($vars);
 				}
-				$comments = $this->searchAnnotation($vars);
 				if(!empty($comments)) {
 						return array_reverse($comments);
 				}
@@ -156,10 +195,22 @@ class OssnComments extends OssnAnnotation {
 		 *
 		 * @params $subject: Subject id
 		 *
+		 * @note [B]getting orphan like records from comments when deleting a post #1687
+		 * @note fixed $type as getComments appends comment: itself
+		 * 
 		 * @return bool
 		 */
-		public function commentsDeleteAll($subject, $type = 'comments:post') {
-				if($this->annon_delete_by_subject($subject, $type)) {
+		public function commentsDeleteAll($subject, $type = 'post') {
+				//here we need a callback for each comment hence we need a indvidual comment.
+				if(empty($subject) || empty($type)) {
+						return false;
+				}
+				//[B]No callback triggered for OssnComments::commentsDeleteAll
+				$list = $this->GetComments($subject, $type, false);
+				if($list) {
+						foreach($list as $comment) {
+								$this->deleteComment($comment->id);
+						}
 						return true;
 				}
 				return false;
@@ -173,8 +224,14 @@ class OssnComments extends OssnAnnotation {
 		 * @return bool
 		 */
 		public function deleteComment($comment) {
+				if(empty($comment)) {
+						return false;
+				}
+				$params            = array();
+				$params['comment'] = $comment;
+
+				ossn_trigger_callback('comment', 'before:delete', $params);
 				if($this->deleteAnnotation($comment)) {
-						$params['comment'] = $comment;
 						ossn_trigger_callback('comment', 'delete', $params);
 						return true;
 				}

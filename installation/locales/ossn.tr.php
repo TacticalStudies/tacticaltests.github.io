@@ -2,9 +2,9 @@
 /**
  * Open Source Social Network
  *
- * @package   (softlab24.com).ossn
- * @author    OSSN Core Team <info@softlab24.com>
- * @copyright 2014-2017 SOFTLAB24 LIMITED
+ * @package   (openteknik.com).ossn
+ * @author    OSSN Core Team <info@openteknik.com>
+ * @copyright (C) OpenTeknik LLC
  * @license   Open Source Social Network License (OSSN LICENSE)  http://www.opensource-socialnetwork.org/licence
  * @link      https://www.opensource-socialnetwork.org/
  */
@@ -40,7 +40,7 @@ $turkish = array(
 	'all:files:required' => 'Tüm dosyalar gerekli! Lütfen dosyaları kontrol edin.',
 	
 	'ossn:install:php' => 'PHP ',
-	'ossn:install:old:php' => "Esk bir PHP versiyonuna (" . PHP_VERSION . ") sahipsiniz. Minimum PHP versiyonu 5.4 olmalıdır.",
+	'ossn:install:old:php' => "Esk bir PHP versiyonuna (" . PHP_VERSION . ") sahipsiniz. Minimum PHP versiyonu 7.0 olmalıdır.",
 	
 	'ossn:install:mysqli' => 'MySQL etkin',
 	'ossn:install:mysqli:required' => 'MySQL PHP  uzatma gerekli',
@@ -72,6 +72,7 @@ $turkish = array(
 	
 	'ossn:install:ziparchive' => 'PHP ZipArchive ENABLED',
 	'ossn:install:ziparchive:error' => 'PHP ZipArchive EXTENSION REQUIRED',
+	'ossn:install:cachedir:note:failed' => 'Dosyalarınızın ve dizinlerinizin doğru apache kullanıcısına ait olduğundan emin olun.',	
 );
 
 ossn_installation_register_languages($turkish);

@@ -2,9 +2,9 @@
 /**
  * Open Source Social Network
  *
- * @package   (softlab24.com).ossn
- * @author    OSSN Core Team <info@softlab24.com>
- * @copyright 2014-2017 SOFTLAB24 LIMITED
+ * @package   (openteknik.com).ossn
+ * @author    OSSN Core Team <info@openteknik.com>
+ * @copyright (C) OpenTeknik LLC
  * @license   Open Source Social Network License (OSSN LICENSE)  http://www.opensource-socialnetwork.org/licence
  * @link      https://www.opensource-socialnetwork.org/
  */
@@ -15,9 +15,17 @@ $cover = new OssnProfile;
 $coverp = $cover->coverParameters($user->guid);
 $cover = $cover->getCoverURL($user);
 
+if(!isset($coverp[0])){
+	$coverp[0] = '';
+}	
+if(!isset($coverp[1])){
+	$coverp[1] = '';
+}	
+$cover_top = '';
 if(!empty($coverp[0])){
 	$cover_top = "top:{$coverp[0]};";
 }
+$cover_left = '';
 if(!empty($coverp[1])){
 	$cover_left = "left:{$coverp[1]};";
 }
@@ -33,12 +41,12 @@ if (ossn_isLoggedIn()) {
 			<div class="<?php echo $class; ?>">
 				<div class="top-container">
 					<div id="container" class="profile-cover">
-						<?php if (ossn_loggedin_user()->guid == $user->guid) { ?>
-						<div class="profile-cover-controls">
+						<?php if (ossn_loggedin_user() && ossn_loggedin_user()->guid == $user->guid) { ?>
+						<div class="profile-cover-controls" style="display:none;cursor:pointer;">
 							<a href="javascript:void(0);" onclick="Ossn.Clk('.coverfile');" class='btn-action change-cover'>
 								<?php echo ossn_print( 'change:cover'); ?>
 							</a>
-							<a href="javascript:void(0);" id="reposition-cover" class='btn-action reposition-cover'>
+							<a href="javascript:void(0);" id="reposition-profile-cover" class='btn-action reposition-cover'>
 								<?php echo ossn_print( 'reposition:cover'); ?>
 							</a>
 						</div>
@@ -48,10 +56,10 @@ if (ossn_isLoggedIn()) {
 							<input type="submit" class="upload" />
 						</form>
 						<?php } ?>
-						<img id="draggable" class="profile-cover-img" src="<?php echo $cover; ?>" style='<?php echo $cover_top; ?><?php echo $cover_left; ?>' />
+						<img id="draggable" class="profile-cover-img" src="<?php echo $cover; ?>" style='<?php echo $cover_top; ?><?php echo $cover_left; ?>' data-top='<?php echo $coverp[0]; ?>' data-left='<?php echo $coverp[1]; ?>'/>
 					</div>
 					<div class="profile-photo">
-						<?php if (ossn_loggedin_user()->guid == $user->guid) { ?>
+						<?php if (ossn_loggedin_user() && ossn_loggedin_user()->guid == $user->guid) { ?>
 						<div class="upload-photo" style="display:none;cursor:pointer;">
 							<span onclick="Ossn.Clk('.pfile');"><?php echo ossn_print('change:photo'); ?></span>
 
@@ -62,25 +70,27 @@ if (ossn_isLoggedIn()) {
 							</form>
 						</div>
 						<?php } 
-						$viewer= '' ; 
-						if (ossn_isLoggedIn() && get_profile_photo_guid($user->guid)) { 
-								$viewer = 'onclick="Ossn.Viewer(\'photos/viewer?user=' . $user->username . '\');"';
-						}
+						//issues with ossn-viewer-comments #1411 (removed viewer)
 						?>
-						<img src="<?php echo $user->iconURL()->larger; ?>" height="170" width="170" <?php echo $viewer; ?> />
+						<img src="<?php echo $user->iconURL()->larger; ?>" height="170" width="170"  />
 					</div>
 					<div class="user-fullname"><?php echo $user->fullname; ?></div>
                     <?php echo ossn_plugin_view('profile/role', array('user' => $user)); ?>
-					<div id='profile-hr-menu' class="profile-hr-menu">
-						<?php echo ossn_view_menu( 'user_timeline'); ?>
+					<div id='profile-hr-menu' class="profile-hr-menu visible-lg">
+						<?php echo ossn_plugin_view('menus/user_timeline', array('menu_width' => 60)); ?>
+					</div>
+					<div id='profile-hr-menu' class="profile-hr-menu visible-md">
+						<?php echo ossn_plugin_view('menus/user_timeline', array('menu_width' => 40)); ?>
+					</div>
+					<div id='profile-hr-menu' class="profile-hr-menu visible-sm">
+						<?php echo ossn_plugin_view('menus/user_timeline', array('menu_width' => 25)); ?>
+					</div>
+					<div id='profile-hr-menu' class="profile-hr-menu visible-xs">
+						<?php echo ossn_plugin_view('menus/user_timeline', array('menu_width' => 1)); ?>
 					</div>
 
 					<div id="profile-menu" class="profile-menu">
-						<?php if (ossn_isLoggedIn()) { if (ossn_loggedin_user()->guid == $user->guid) { ?>
-						<a href="<?php echo $user->profileURL('/edit'); ?>" class='btn-action'>
-							<?php echo ossn_print( 'update:info'); ?>
-						</a>
-						<?php } ?>
+						<?php if (ossn_isLoggedIn()) { ?>
 						<?php if (ossn_loggedin_user()->guid !== $user->guid) { if (!ossn_user_is_friend(ossn_loggedin_user()->guid, $user->guid)) { if (ossn_user()->requestExists(ossn_loggedin_user()->guid, $user->guid)) { ?>
 						<a href="<?php echo ossn_site_url("action/friend/remove?cancel=true&user={$user->guid}", true); ?>" class='btn-action'>
                                 <?php echo ossn_print('cancel:request'); ?>
@@ -93,9 +103,11 @@ if (ossn_isLoggedIn()) {
 						<a href="<?php echo ossn_site_url("action/friend/remove?user={$user->guid}", true); ?>"  class='btn-action'>
                             <?php echo ossn_print('remove:friend'); ?>
                         </a>
+						<?php } 
+						if(com_is_active('OssnMessages')) { ?>
+							<a href="<?php echo ossn_site_url("messages/message/{$user->username}"); ?>" id="profile-message" data-guid='<?php echo $user->guid; ?>' class='btn-action'>
+							<?php echo ossn_print('message'); ?></a>
 						<?php } ?>
-					  	<a href="<?php echo ossn_site_url("messages/message/{$user->username}"); ?>" id="profile-message" data-guid='<?php echo $user->guid; ?>' class='btn-action'>
-                        <?php echo ossn_print('message'); ?></a>
 						<div class="ossn-profile-extra-menu dropdown">
 							<?php echo ossn_view_menu( 'profile_extramenu', 'profile/menus/extra'); ?>
 						</div>

@@ -2,9 +2,9 @@
 /**
  * Open Source Social Network
  *
- * @package   (softlab24.com).ossn
- * @author    OSSN Core Team <info@softlab24.com>
- * @copyright 2014-2017 SOFTLAB24 LIMITED
+ * @package   (openteknik.com).ossn
+ * @author    OSSN Core Team <info@openteknik.com>
+ * @copyright (C) OpenTeknik LLC
  * @license   Open Source Social Network License (OSSN LICENSE)  http://www.opensource-socialnetwork.org/licence
  * @link      https://www.opensource-socialnetwork.org/
  */
@@ -50,14 +50,6 @@ $ro = array(
 	'search:users' => 'Oameni',
 	'admin:logout' => 'Logheaza afara',
 	'logout' => 'Logheaza afara',
-	
-	'ossn:like:this' => 'Lui %s i-a placut asta',
-	'ossn:like:you:and:this' => 'Tu si %s v-au placut asta',
-	'ossn:like:people' => '%s Persoane',
-	'ossn:like:person' => '%s Persoana',
-	'ossn:liked:you' => 'Ti-a placut asta',
-	'ossn:unlike' => 'Nu imi mai place',
-	'ossn:like' => 'Imi place',
 	
 	'admin:components' => 'Componente',
 	'admin:dashboard' => 'BORD',
@@ -133,8 +125,30 @@ Poti sa copy si paste adresa in browser in caz in care nu merge.
 	'login:error' => 'Nume sau parola invalida!',
 	'login:error:sub' => "Nu v-am putut loga. Te rugam sa verifici numele utilizatorului si parola si incearca din nou.",
 	'login:success' => 'Esti logat in!',
-	'com:installed' => 'Componentul a fost upladat in lista de componente, acum poti sa il activezi in lista de Componente.',
-	'com:install:error' => 'Componentul nu poate fii uploadat, verifica fisierul.',
+	
+	'ossn:com:installer:create:tmpdir:error' => 'Nu se poate crea directorul de date temporare', 
+	'ossn:com:installer:upload:error' => 'A apărut o eroare în timpul încărcării: %s',
+	'ossn:com:installer:version:error' => 'Această componentă necesită OSSN %s sau mai mare',
+	'ossn:com:installer:remove:comdir:error' => 'Acest component a fost deja instalat - vă rugăm să îl ștergeți din listă pe pagina componentelor',
+	'ossn:com:installer:create:comdir:error' => 'Nu se pot copia fișierele în directorul componentelor',
+	'ossn:com:installer:xml:incomplete:error' => 'Fișierul cu descrierea componentelor lipsește sau este incomplet',
+	'ossn:com:installer:zip:incomplete:error' => 'Componentă arhivă zip incompletă',
+	'ossn:com:installer:open:zip:error' => 'Nu se poate deschide arhiva zip a componentelor',
+	'ossn:com:installer:move:uploaded:file:error' => 'Arhivă zip nevalidă',
+	'ossn:com:installer:com:installation:success' => 'Componentul a fost upladat in lista de componente, acum poti sa il activezi in lista de Componente.',
+
+	'ossn:theme:installer:create:tmpdir:error' => 'Nu se poate crea directorul de date temporare', 
+	'ossn:theme:installer:upload:error' => 'A apărut o eroare în timpul încărcării: %s',
+	'ossn:theme:installer:version:error' => 'Această temă necesită Ossn %s sau mai mare',
+	'ossn:theme:installer:remove:themedir:error' => 'Această temă a fost deja instalată - vă rugăm să o ștergeți din listă pe pagina temelor',
+	'ossn:theme:installer:create:themedir:error' => 'Nu se pot copia fișierele în directorul temei',
+	'ossn:theme:installer:xml:incomplete:error' => 'Fișierul cu descrierea temei lipsă sau incomplet',
+	'ossn:theme:installer:zip:incomplete:error' => 'Tema arhivă zip incompletă',
+	'ossn:theme:installer:open:zip:error' => 'Nu se poate deschide arhiva zip cu temă',
+	'ossn:theme:installer:move:uploaded:file:error' => 'Arhivă zip nevalidă',
+	'ossn:theme:installer:theme:installation:success' => 'Tema a fost încărcată în lista de teme, acum o puteți activa din pagina temelor.',
+	
+	
 	'settings:saved' => 'Setingurile au fost salvate',
 	'com:deleted' => 'Componentul a fost sters!',
 	'com:delete:error' => 'Nu putem sterge Componentul! Incearca mai tarziu.',
@@ -291,11 +305,27 @@ Te rugam sa click pe linkul de mai jos ca sa iti resetezi parola sau copy si pas
 	'admin:com:author:url' => 'Autor URL',
 	'admin:com:license' => 'Licenta',
 	'admin:com:requirements' => 'Cerinte tehnice',
-	'admin:com:availability' => 'Availabilitate',
+	'admin:com:requirement' => 'Cerinţă',
+	'admin:com:fulfilled' => 'îndeplinit',
+	'admin:com:used:by' => 'Folosit de',
 	'ossn:exception:make:sure' => 'Esti sigur (a)?',
 	'ossn:premium' => 'Versiune Premium',
 	'datepicker:days' => "Du, Lu, Ma, Mi, Jo, Vi, Sa",
 	'datepicker:months' => "Ian., Feb., Mar., Apr., Mai, Iunie, Iulie, Aug., Sep., Oct., Noi., Dec.",
+	'male:gendercolor' => '#01ADEF',
+	'female:gendercolor' => '#ED008C',
+	'ossn:admin:settings:off' => 'oprit',
+	'ossn:admin:settings:on' => 'pornit',
+	'ossn:admin:settings:saved' => 'Setingurile au fost salvate!',
+	'ossn:admin:settings:save:error' => 'Setarile nu pot fii salvate! Verificați fișierul dvs error_log.',
+	'php:upload_err_ok' => 'Nu există nicio eroare, fișierul încărcat cu succes',
+	'php:upload_err_ini_size' => 'Fișierul încărcat depășește directiva UPLOAD_MAX_FILESIZE din PHP.INI',
+	'php:upload_err_form_size' => 'Fișierul încărcat depășește directiva MAX_FILE_SIZE care a fost specificată în formularul HTML',
+	'php:upload_err_partial' => 'Fișierul încărcat a fost încărcat doar parțial',
+	'php:upload_err_no_file' => 'Nu a fost încărcat niciun fișier',
+	'php:upload_err_no_tmp_dir' => 'Lipsește un folder temporar',
+	'php:upload_err_cant_write' => 'Nu a reușit să scrie fișierul pe disc',
+	'php:upload_err_extension' => 'O extensie PHP a oprit încărcarea fișierului',
 	/*
 	 * List of ISO 639-1 language codes
 	 * http://en.wikipedia.org/wiki/List_of_ISO_639-1_codes

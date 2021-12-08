@@ -2,15 +2,18 @@
 /**
  * Open Source Social Network
  *
- * @package Open Source Social Network
- * @author    Open Social Website Core Team <info@softlab24.com>
- * @copyright 2014-2017 SOFTLAB24 LIMITED
+ * @package   Open Source Social Network
+ * @author    Open Social Website Core Team <info@openteknik.com>
+ * @copyright (C) OpenTeknik LLC
  * @license   Open Source Social Network License (OSSN LICENSE)  http://www.opensource-socialnetwork.org/licence
  * @link      https://www.opensource-socialnetwork.org/
  */
 define('__OSSN_COMMENTS__', ossn_route()->com . 'OssnComments/');
 require_once(__OSSN_COMMENTS__ . 'classes/OssnComments.php');
 require_once(__OSSN_COMMENTS__ . 'libs/comments.php');
+if(!com_is_active('OssnNotifications')) {
+	require_once(ossn_route()->com . 'OssnNotifications/classes/OssnNotifications.php');
+}
 
 /**
  * Initialize Comments Component
@@ -20,15 +23,20 @@ require_once(__OSSN_COMMENTS__ . 'libs/comments.php');
  */
 function ossn_comments() {
 		if(ossn_isLoggedin()) {
+			    //here post is not a wallpost
 				ossn_register_action('post/comment', __OSSN_COMMENTS__ . 'actions/post/comment.php');
 				ossn_register_action('post/entity/comment', __OSSN_COMMENTS__ . 'actions/post/entity/comment.php');
+				ossn_register_action('post/object/comment', __OSSN_COMMENTS__ . 'actions/post/object/comment.php');
+				
 				ossn_register_action('delete/comment', __OSSN_COMMENTS__ . 'actions/comment/delete.php');
 				ossn_register_action('comment/edit', __OSSN_COMMENTS__ . 'actions/comment/edit.php');
+				ossn_register_action('comment/embed', __OSSN_COMMENTS__ . 'actions/comment/embed.php');
 		}
 		ossn_add_hook('post', 'comments', 'ossn_post_comments');
 		ossn_add_hook('post', 'comments:entity', 'ossn_post_comments_entity');
+		ossn_add_hook('post', 'comments:object', 'ossn_object_comments_entity');
 		
-		ossn_extend_view('js/opensource.socialnetwork', 'js/OssnComments');
+		ossn_extend_view('js/ossn.site', 'js/OssnComments');
 		ossn_extend_view('css/ossn.default', 'css/comments');
 		
 		ossn_register_page('comment', 'ossn_comment_page');
@@ -36,9 +44,16 @@ function ossn_comments() {
 		if(ossn_isLoggedin()) {
 				ossn_register_callback('comment', 'load', 'ossn_comment_menu');
 				ossn_register_callback('comment', 'load', 'ossn_comment_edit_menu');
+				
 				ossn_register_callback('post', 'delete', 'ossn_post_comments_delete');
+				ossn_register_callback('object', 'deleted', 'ossn_object_comments_delete');
+				//[E] There should be callback to delete entity likes, comments by default #1877
+				ossn_register_callback('delete', 'entity', 'ossn_entity_comments_delete');
+				
 				ossn_register_callback('wall', 'load:item', 'ossn_wall_comment_menu');
 				ossn_register_callback('entity', 'load:comment:share:like', 'ossn_entity_comment_link');
+				ossn_register_callback('object', 'load:comment:share:like', 'ossn_object_comment_link');
+				
 				ossn_register_callback('comment', 'delete', 'ossn_comment_notifications_delete');
 		}
 }
@@ -61,6 +76,9 @@ function ossn_comment_notifications_delete($callback, $type, $vars) {
 						'type' => array(
 								'comments:post',
 								'like:annotation',
+								'like:annotation:comments:post',
+								'like:annotation:comments:object',
+								'like:annotation:comments:entity',
 								'comments:entity:file:profile:photo',
 								'comments:entity:file:profile:cover',
 								'comments:entity:file:ossn:aphoto'
@@ -80,17 +98,47 @@ function ossn_comment_notifications_delete($callback, $type, $vars) {
 function ossn_entity_comment_link($callback, $type, $params) {
 		$guid = $params['entity']->guid;
 		ossn_unregister_menu('comment', 'entityextra');
-		
+		if(isset($params['allow_comment']) && $params['allow_comment'] == false){
+			$guid = false;
+			//false will just not execute the likes menu
+		}		
 		if(!empty($guid) && ossn_isLoggedIn()) {
 				ossn_register_menu_item('entityextra', array(
 						'name' => 'comment',
-						'class' => "comment-post",
+						'class' => "comment-entity",
 						'href' => "javascript:void(0)",
 						'data-guid' => $guid,
 						'text' => ossn_print('comment:comment')
 				));
 		}
 		ossn_trigger_callback('comment', 'entityextra:menu', $params);
+}
+/**
+ * Object comment link
+ *
+ * @param string  $callback A callback name
+ * @param string  $type A callback type
+ * @param array   $params Option values
+ *
+ * @return void
+ */
+function ossn_object_comment_link($callback, $type, $params) {
+		$guid = $params['object']->guid;
+		ossn_unregister_menu('comment', 'object_comment_like');
+		if(isset($params['allow_comment']) && $params['allow_comment'] == false){
+			$guid = false;
+			//false will just not execute the likes menu
+		}		
+		if(!empty($guid) && ossn_isLoggedIn()) {
+				ossn_register_menu_item('object_comment_like', array(
+						'name' => 'comment',
+						'class' => "comment-object",
+						'href' => "javascript:void(0)",
+						'data-guid' => $guid,
+						'text' => ossn_print('comment:comment')
+				));
+		}
+		ossn_trigger_callback('comment', 'object:comment:like:menu', $params);
 }
 /**
  * Add a comment menu item in post
@@ -132,6 +180,15 @@ function ossn_post_comments($hook, $type, $return, $params) {
 }
 
 /**
+ * View comments bar on object
+ *
+ * @return mix data;
+ * @access private
+ */
+function ossn_object_comments_entity($hook, $type, $return, $params) {
+		return ossn_plugin_view('comments/post/comments_object', $params);
+}
+/**
  * View comments bar on entity
  *
  * @return mix data;
@@ -140,6 +197,7 @@ function ossn_post_comments($hook, $type, $return, $params) {
 function ossn_post_comments_entity($hook, $type, $return, $params) {
 		return ossn_plugin_view('comments/post/comments_entity', $params);
 }
+
 
 /**
  * Delete post comments
@@ -152,6 +210,30 @@ function ossn_post_comments_delete($event, $type, $params) {
 		$delete->commentsDeleteAll($params);
 }
 
+/**
+ * Delete post comments
+ *
+ * @return void;
+ * @access private
+ */
+function ossn_object_comments_delete($event, $type, $params) {
+		if(isset($params['guid'])){
+			$delete = new OssnComments;
+			$delete->commentsDeleteAll($params['guid'], 'object');
+		}
+}	
+/**
+ * Delete entities comments
+ *
+ * @return void;
+ * @access private
+ */
+function ossn_entity_comments_delete($event, $type, $params) {
+		if(isset($params['entity'])){
+			$delete = new OssnComments;
+			$delete->commentsDeleteAll($params['entity'], 'entity');
+		}
+}	
 /**
  * Delete comment menu
  *
@@ -182,20 +264,38 @@ function ossn_comment_menu($name, $type, $params) {
 						//check if type is group
 						if($post->type == 'group') {
 								$group = ossn_get_group_by_guid($post->owner_guid);
+						} else {
+								$group = false;
 						}
 						//group admins must be able to delete ANY comment in their own group #170
 						//just show menu if group owner is loggedin 
-						if(ossn_isAdminLoggedin() || (ossn_loggedin_user()->guid == $post->owner_guid) || $user->guid == $comment->owner_guid || (ossn_loggedin_user()->guid == $group->owner_guid)) {
+						if(ossn_isAdminLoggedin() || (ossn_loggedin_user()->guid == $post->owner_guid) || ($comment && $user->guid == $comment->owner_guid) || ($group && ossn_loggedin_user()->guid == $group->owner_guid)) {
 								ossn_unregister_menu('delete', 'comments');
 								ossn_register_menu_item('comments', array(
 										'name' => 'delete',
 										'href' => ossn_site_url("action/delete/comment?comment={$params['id']}", true),
-										'class' => 'ossn-delete-comment',
+										'class' => 'dropdown-item ossn-delete-comment',
 										'text' => ossn_print('comment:delete'),
 										'priority' => 200
 								));
 						}
 				}
+		}
+		//delete object comments
+		if($comment->type == 'comments:object') {
+						$object     = ossn_get_object($comment->subject_guid);
+						if($object){
+							if(ossn_isAdminLoggedin() || ($object->type == 'user' && ossn_loggedin_user()->guid == $object->owner_guid) || $user->guid == $comment->owner_guid) {
+								ossn_unregister_menu('delete', 'comments');
+								ossn_register_menu_item('comments', array(
+										'name' => 'delete',
+										'href' => ossn_site_url("action/delete/comment?comment={$params['id']}", true),
+										'class' => 'dropdown-item ossn-delete-comment',
+										'text' => ossn_print('comment:delete'),
+										'priority' => 200
+								));
+							}
+						}
 		}
 		//this section is for entity comment only
 		if(ossn_isLoggedin() && $comment->type == 'comments:entity') {
@@ -205,7 +305,7 @@ function ossn_comment_menu($name, $type, $params) {
 						ossn_register_menu_item('comments', array(
 								'name' => 'delete',
 								'href' => ossn_site_url("action/delete/comment?comment={$params['id']}", true),
-								'class' => 'ossn-delete-comment',
+								'class' => 'dropdown-item ossn-delete-comment',
 								'text' => ossn_print('comment:delete'),
 								'priority' => 200
 						));
@@ -224,20 +324,19 @@ function ossn_comment_menu($name, $type, $params) {
 function ossn_comment_edit_menu($name, $type, $comment) {
 		ossn_unregister_menu('edit', 'comments');
 		$user = ossn_loggedin_user();
-		if(empty($comment['id'])){
-			return false;
-		}
-		$comment = (object)$comment;
-		if(ossn_isLoggedin()) {
-				if(($user->guid == $comment->owner_guid) || $user->canModerate()) {
-						ossn_unregister_menu('edit', 'comments');
-						ossn_register_menu_item('comments', array(
-								'name' => 'edit',
-								'href' => 'javascript:void(0);',
-								'data-guid' => $comment->id,
-								'class' => 'ossn-edit-comment',
-								'text' => ossn_print('edit')
-						));
+		if(!empty($comment['id'])) {
+				$comment = (object) $comment;
+				if(ossn_isLoggedin()) {
+						if(($user->guid == $comment->owner_guid) || $user->canModerate()) {
+								ossn_unregister_menu('edit', 'comments');
+								ossn_register_menu_item('comments', array(
+										'name' => 'edit',
+										'href' => 'javascript:void(0);',
+										'data-guid' => $comment->id,
+										'class' => 'dropdown-item ossn-edit-comment',
+										'text' => ossn_print('edit')
+								));
+						}
 				}
 		}
 }
@@ -312,10 +411,19 @@ function ossn_comment_page($pages) {
 								$file = ossn_string_decrypt(base64_decode($image));
 								header('content-type: image/jpeg');
 								$file = rtrim(ossn_validate_filepath($file), '/');
-								if(is_file($file)) {
-										echo file_get_contents($file);
+								
+								$tmpphotos = ossn_get_userdata("tmp/photos/");
+								$filename  = str_replace($tmpphotos, '', $file);
+								$file      = $tmpphotos.$filename;
+								//avoid slashes in the file. 
+								if(strpos($filename, '\\') !== FALSE || strpos($filename, '/') !== FALSE) {
+										redirect();
 								} else {
-										ossn_error_page();
+										if(is_file($file)) {
+												echo file_get_contents($file);
+										} else {
+												redirect();
+										}
 								}
 						} else {
 								ossn_error_page();
@@ -336,6 +444,7 @@ function ossn_comment_page($pages) {
 										'contents' => ossn_view_form('comment/edit', array(
 												'action' => ossn_site_url('action/comment/edit'),
 												'component' => 'OssnComments',
+												'id' => 'ossn-comment-edit-form',
 												'params' => array(
 														'comment' => $comment
 												)

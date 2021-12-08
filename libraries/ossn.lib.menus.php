@@ -2,9 +2,9 @@
 /**
  * Open Source Social Network
  *
- * @package   (softlab24.com).ossn
- * @author    OSSN Core Team <info@softlab24.com>
- * @copyright 2014-2017 SOFTLAB24 LIMITED
+ * @package   (openteknik.com).ossn
+ * @author    OSSN Core Team <info@openteknik.com>
+ * @copyright (C) OpenTeknik LLC
  * @license   Open Source Social Network License (OSSN LICENSE)  http://www.opensource-socialnetwork.org/licence
  * @link      https://www.opensource-socialnetwork.org/
  */
@@ -107,7 +107,8 @@ function ossn_view_menu($menu, $custom = false) {
  */
 function ossn_register_sections_menu($menu = '', array $params = array()) {
 				if(!isset($params['name'])){
-						$params['name'] = md5($params['name']);	
+						//If not set section menu name #1479
+						$params['name'] = md5($params['url']);	
 				}
 				if(isset($params['url'])){
 					$params['href'] = $params['url'];

@@ -2,9 +2,9 @@
 /**
  * Open Source Social Network
  *
- * @package Open Source Social Network
- * @author    Open Social Website Core Team <info@softlab24.com>
- * @copyright 2014-2017 SOFTLAB24 LIMITED
+ * @package   Open Source Social Network
+ * @author    Open Social Website Core Team <info@openteknik.com>
+ * @copyright (C) OpenTeknik LLC
  * @license   Open Source Social Network License (OSSN LICENSE)  http://www.opensource-socialnetwork.org/licence
  * @link      https://www.opensource-socialnetwork.org/
  */
@@ -17,5 +17,8 @@ $ro = array(
     'user:unblock:error' => 'Nu putem debloca utilizatorul',
     'ossn:blocked:error' => 'Blocat',
     'ossn:blocked:error:note' => 'Nu puteti vedea pagina pentru ca ati fost blocat de utilizator.',
+	
+	'ossn:profile:edit:tab' => 'Blocare',
+	'ossn:profile:list:text' => "Această pagină conține lista persoanelor pe care le-ați blocat.",	
 );
 ossn_register_languages('ro', $ro); 

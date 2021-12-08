@@ -1,11 +1,10 @@
 <?php
-
 /**
  * Open Source Social Network
  *
- * @package   (softlab24.com).ossn
- * @author    OSSN Core Team <info@softlab24.com>
- * @copyright 2014-2017 SOFTLAB24 LIMITED
+ * @package   (openteknik.com).ossn
+ * @author    OSSN Core Team <info@openteknik.com>
+ * @copyright (C) OpenTeknik LLC
  * @license   Open Source Social Network License (OSSN LICENSE)  http://www.opensource-socialnetwork.org/licence
  * @link      https://www.opensource-socialnetwork.org/
  */
@@ -39,9 +38,6 @@ class OssnInstallation {
 		 *
 		 */
 		public static function is_mod_rewrite() {
-				if(isset($_REQUEST['mod_rewrite_check_skip']) && $_REQUEST['mod_rewrite_check_skip'] == true) {
-						return true;
-				}
 				$file    = ossn_url();
 				$rewrite = ossn_installation_simple_curl($file . 'rewrite.php');
 				if($rewrite == 1) {
@@ -96,8 +92,10 @@ class OssnInstallation {
 		 */
 		public static function isPhp() {
 				$phpversion = substr(PHP_VERSION, 0, 6);
-				//$phpversion < 5.6 , works fine with php 5.6
-				if($phpversion >= 5.4) {
+				//$phpversion >= 5.6 , works fine with php 5.6
+			        //Support php 5.6 or larger remove support for < 5.6 #1287
+				//8tH April 2020, remove support for outdated PHP version
+				if($phpversion >= 7.0) {
 						return true;
 				}
 				return false;
@@ -131,7 +129,24 @@ class OssnInstallation {
 				}
 				return false;
 		}
-		
+		/**
+		 * Check if cache directory is writeable or not
+		 *
+		 * @return boolean
+		 */
+		 public static function isCacheWriteable(){
+					$path = str_replace('installation/', '', ossn_installation_paths()->root);
+					$path = $path . 'cache';	
+					if(!is_dir($path)){
+						if(mkdir($path, 0755, true)){
+								rmdir($path);
+								return true;	
+						} else {
+								return false;	
+						}
+					}
+					return false;
+		 }
 		/**
 		 * Check if mysqli class exist exist or not
 		 *
@@ -264,6 +279,18 @@ class OssnInstallation {
 						$this->error_mesg = ossn_installation_print('data:directory:invalid');
 						return false;
 				}			
+				if(!file_put_contents($this->datadir . 'writeable', 1)){
+						$this->error_mesg = ossn_installation_print('data:directory:invalid');
+						return false;						
+				} else {
+					$writeable  = file_get_contents($this->datadir . 'writeable');	
+					if(!$writeable || $writeable &&  $writeable != 1){
+						$this->error_mesg = ossn_installation_print('data:directory:invalid');
+						return false;							
+					}
+				}
+				unlink($this->datadir . 'writeable');
+				
 				if(!$this->dbconnect()) {
 						$this->error_mesg = $this->connect_err->connect_errn;
 						return false;
@@ -272,7 +299,7 @@ class OssnInstallation {
 						$script         = str_replace('<<owner_email>>', $this->startup_settings['owner_email'], $script);
 						$script         = str_replace('<<notification_email>>', $this->startup_settings['notification_email'], $script);
 						$script         = str_replace('<<sitename>>', $this->startup_settings['sitename'], $script);
-						$script         = str_replace("<<screat>>", substr(md5('ossn' . rand()), 3, 8), $script);
+						$script         = str_replace("<<secret>>", substr(md5('ossn' . bin2hex(random_bytes(6))), 3, 8), $script);
 						$errors         = array();
 						$script         = preg_replace('/\-\-.*\n/', '', $script);
 						$sql_statements = preg_split('/;[\n\r]+/', $script);

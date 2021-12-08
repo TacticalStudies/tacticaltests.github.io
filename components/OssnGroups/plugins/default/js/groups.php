@@ -1,14 +1,14 @@
+//<script>
 Ossn.RegisterStartupFunction(function() {
 	$(document).ready(function() {
-		$('#ossn-group-add').click(function() {
+		$('#ossn-group-add').on('click', function() {
 			Ossn.MessageBox('groups/add');
 		});
 	});
 });
-
 Ossn.RegisterStartupFunction(function() {
 	$(document).ready(function() {
-		$("#group-upload-cover").submit(function(event) {
+		$("#group-upload-cover").on('submit', function(event) {
 			event.preventDefault();
 			var formData = new FormData($(this)[0]);
 			var $url = Ossn.site_url + 'action/group/cover/upload';
@@ -25,7 +25,7 @@ Ossn.RegisterStartupFunction(function() {
 						height = img.naturalHeight;
 
 					window.URL.revokeObjectURL(img.src);
-					if (width < 850 || height < 300) {
+					if (width < 1040 || height < 300) {
 						Ossn.trigger_message(Ossn.Print('profile:cover:err1:detail'), 'error');
 						return false;
 					} else {
@@ -40,6 +40,8 @@ Ossn.RegisterStartupFunction(function() {
 								} else {
 									$('.ossn-group-cover').attr('style', 'opacity:0.7;');
 								}
+								$('.ossn-group-profile').find('.groups-buttons').find('a').hide();
+								$('.ossn-group-cover').prepend('<div class="ossn-covers-uploading-annimation"> <div class="ossn-loading"></div></div>');
 							},
 							cache: false,
 							contentType: false,
@@ -50,7 +52,10 @@ Ossn.RegisterStartupFunction(function() {
 										location.reload();
 									} else {
 										$('.ossn-group-cover').attr('style', '');
+										$('.ossn-covers-uploading-annimation').remove();
+										$('.ossn-group-profile').find('.groups-buttons').find('a').show();
 										$('.ossn-group-cover').find('img').attr('style', '');
+										$('.ossn-group-cover').find('img').show();
 										$('.ossn-group-cover').find('img').attr('src', callback['url']);
 									}
 								}
@@ -65,85 +70,71 @@ Ossn.RegisterStartupFunction(function() {
 			return false;
 		});
 
-		$('#add-cover-group').click(function(e) {
+		$('#add-cover-group').on('click', function(e) {
 			e.preventDefault();
 			$('#group-upload-cover').find('.coverfile').click();
 		});
 	});
 });
 
-
-
-
 Ossn.RegisterStartupFunction(function() {
 	$(document).ready(function() {
-		$('#reposition-cover').click(function() {
+		$('#reposition-group-cover').on('click', function() {
 			$('.group-c-position').attr('style', 'display:inline-block !important;');
-			$(function() {
-				$.globalVars = {
-					originalTop: 0,
-					originalLeft: 0,
-					maxHeight: $("#draggable").height() - $("#container").height(),
-					maxWidth: $("#draggable").width() - $("#container").width()
-				};
-				$("#draggable").draggable({
-					start: function(event, ui) {
-						if (ui.position != undefined) {
-							$.globalVars.originalTop = ui.position.top;
-							$.globalVars.originalLeft = ui.position.left;
-						}
-					},
-					drag: function(event, ui) {
-						var newTop = ui.position.top;
-						var newLeft = ui.position.left;
-						if (ui.position.top < 0 && ui.position.top * -1 > $.globalVars.maxHeight) {
-							newTop = $.globalVars.maxHeight * -1;
-						}
-						if (ui.position.top > 0) {
-							newTop = 0;
-						}
-						if (ui.position.left < 0 && ui.position.left * -1 > $.globalVars.maxWidth) {
-							newLeft = $.globalVars.maxWidth * -1;
-						}
-						if (ui.position.left > 0) {
-							newLeft = 0;
-						}
-						ui.position.top = newTop;
-						ui.position.left = newLeft;
-
-						Ossn.GroupCover_top = newTop;
-						Ossn.GroupCover_left = newLeft;
-					}
-				});
-			});
+			$('.ossn-group-cover-button').hide();
+			$('.ossn-group-cover').unbind('mouseenter').unbind('mouseleave');
+			Ossn.Drag();
 		});
 	});
 });
 
 Ossn.RegisterStartupFunction(function() {
 	$(document).ready(function() {
-		$('.ossn-group-cover').hover(function() {
+		$('.ossn-group-cover').on('mouseenter', function(){
 			$('.ossn-group-cover-button').show();
-		}, function() {
-			$('.ossn-group-cover-button').hide();
 		});
+		$('.ossn-group-cover').on('mouseleave', function(){
+			$('.ossn-group-cover-button').hide();
+		});			
 	});
 });
 
 Ossn.repositionGroupCOVER = function($group) {
+	var cover_top  = parseInt($('.ossn-group-cover').find('img').css('top'));
+	var cover_left = parseInt($('.ossn-group-cover').find('img').css('left'));
 	var $url = Ossn.site_url + "action/group/cover/reposition";
 	$.ajax({
 		async: true,
 		type: 'post',
-		data: '&top=' + Ossn.GroupCover_top + '&left=' + Ossn.GroupCover_left + '&group=' + $group,
+		data: '&top=' + cover_top + '&left=' + cover_left + '&group=' + $group,
 		url: Ossn.AddTokenToUrl($url),
 		success: function(callback) {
+			$("#draggable").draggable('destroy');
 			$('.group-c-position').attr('style', 'display:none !important;');
-			$("#draggable").draggable({
-				drag: function() {
-					return false;
-				}
+			$('.ossn-group-cover').hover(function() {
+				$('.ossn-group-cover-button').show();
+			}, function() {
+				$('.ossn-group-cover-button').hide();
 			});
 		},
 	});
 };
+							
+Ossn.RegisterStartupFunction(function() {
+	$(document).ready(function() {
+		$('.ossn-group-change-owner').on('click', function(e) {
+			e.preventDefault();
+			var new_owner = $(this).attr('data-new-owner');
+			var is_admin  = $(this).attr('data-is-admin');
+			if (is_admin) {
+				var del = confirm(Ossn.Print('group:memb:make:owner:admin:confirm', [new_owner]));
+			} else {
+				var del = confirm(Ossn.Print('group:memb:make:owner:confirm', [new_owner]));
+			}
+			if (del == true) {
+				var actionurl = $(this).attr('href');
+				window.location = actionurl;
+			}
+		});
+	});
+});

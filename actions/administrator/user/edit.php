@@ -2,9 +2,9 @@
 /**
  * Open Source Social Network
  *
- * @package   (softlab24.com).ossn
- * @author    OSSN Core Team <info@softlab24.com>
- * @copyright 2014-2017 SOFTLAB24 LIMITED
+ * @package   (openteknik.com).ossn
+ * @author    OSSN Core Team <info@openteknik.com>
+ * @copyright (C) OpenTeknik LLC
  * @license   Open Source Social Network License (OSSN LICENSE)  http://www.opensource-socialnetwork.org/licence
  * @link      https://www.opensource-socialnetwork.org/
  */
@@ -14,7 +14,8 @@ if(!$entity){
 }
 $user['firstname'] = input('firstname');
 $user['lastname'] = input('lastname');
-$user['email'] = input('email');
+//[E] make user email lowercase when adding to db #186
+$user['email'] = strtolower(input('email'));
 $user['type'] = input('type');
 $user['username'] = input('username');
 
@@ -31,6 +32,11 @@ if (!empty($user)) {
         }
     }
 }
+if(isset($fields['non_required'])) {
+	foreach($fields['non_required'] as $field){
+		$user[$field] = input($field);
+	}
+}
 $password = input('password');
 
 $types = array(
@@ -46,9 +52,12 @@ $OssnUser = new OssnUser;
 $OssnUser->password = $password;
 $OssnUser->email = $user['email'];
 
+//if not algo specified when user edit md5 is used #1503
+if(isset($entity->password_algorithm) && !empty($entity->password_algorithm)){
+		$OssnUser->setPassAlgo($entity->password_algorithm);
+}
+
 $OssnDatabase = new OssnDatabase;
-
-
 $params['table'] = 'ossn_users';
 $params['wheres'] = array("guid='{$entity->guid}'");
 

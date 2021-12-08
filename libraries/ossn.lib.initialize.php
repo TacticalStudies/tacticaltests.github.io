@@ -2,9 +2,9 @@
 /**
  * Open Source Social Network
  *
- * @package   (softlab24.com).ossn
- * @author    OSSN Core Team <info@softlab24.com>
- * @copyright 2014-2017 SOFTLAB24 LIMITED
+ * @package   (openteknik.com).ossn
+ * @author    OSSN Core Team <info@openteknik.com>
+ * @copyright (C) OpenTeknik LLC
  * @license   Open Source Social Network License (OSSN LICENSE)  http://www.opensource-socialnetwork.org/licence
  * @link      https://www.opensource-socialnetwork.org/
  */
@@ -14,7 +14,7 @@ $available_languages = ossn_get_available_languages();
 foreach($available_languages as $language) {
 		ossn_register_language($language, ossn_route()->locale . "ossn.{$language}.php");
 }
-ossn_default_load_locales();
+//ossn_default_load_locales();
 /**
  * Initialize the css library
  *

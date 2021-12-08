@@ -2,9 +2,9 @@
 /**
  * Open Source Social Network
  *
- * @package   (softlab24.com).ossn
- * @author    OSSN Core Team <info@softlab24.com>
- * @copyright 2014-2017 SOFTLAB24 LIMITED
+ * @package   (openteknik.com).ossn
+ * @author    OSSN Core Team <info@openteknik.com>
+ * @copyright (C) OpenTeknik LLC
  * @license   Open Source Social Network License (OSSN LICENSE)  http://www.opensource-socialnetwork.org/licence
  * @link      https://www.opensource-socialnetwork.org/
  */
@@ -46,24 +46,37 @@ if ($total > 0) {
                 </div>
             </div>
         </div>
+ 		<script>
+			Ossn.ChatLoading(<?php echo $user->guid; ?>);
+	 	</script>
         <!-- $arsalan.shah datatstart -->
         <div class="data" id="ossn-chat-messages-data-<?php echo $user->guid; ?>">
             <?php
-            $messages_meta = ossn_chat()->get(ossn_loggedin_user()->guid, $user->guid);
+		$messages_meta  = ossn_chat()->getWith(ossn_loggedin_user()->guid, $user->guid);
+		$messages_count = ossn_chat()->getWith(ossn_loggedin_user()->guid, $user->guid, true);
+		echo ossn_view_pagination($messages_count, 10, array(
+			'offset_name' => "offset_message_xhr_with_{$user->guid}",															 
+		));			
             if ($messages_meta) {
                 foreach ($messages_meta as $message) {
-                    if (ossn_loggedin_user()->guid == $message->message_from) {
-                        $vars['message'] = linkify_chat($message->message);
-                        $vars['time'] = $message->time;
-                        $vars['id'] = $message->id;
-                        echo ossn_plugin_view('chat/message-item-send', $vars);
-                    } else {
-                        $vars['reciever'] = ossn_user_by_guid($message->message_from);
-                        $vars['message'] = linkify_chat($message->message);
-                        $vars['time'] = $message->time;
-                        $vars['id'] = $message->id;
-                        echo ossn_plugin_view('chat/message-item-received', $vars);
-                    }
+			$deleted = false;
+			$class = '';
+			if(isset($message->is_deleted) && $message->is_deleted == true){
+				$deleted = true;
+				$class = ' ossn-message-deleted';
+			}							
+			$vars['message'] = ossn_message_print($message->message);
+			$vars['time'] = $message->time;
+			$vars['id'] = $message->id;
+			$vars['deleted'] = $deleted;
+			$vars['class'] = $class;	
+			$vars['instance'] = (clone $message);
+                    	if (ossn_loggedin_user()->guid == $message->message_from) {
+                      	  	echo ossn_plugin_view('chat/message-item-send', $vars);
+                   	 } else {
+                        	$vars['reciever'] = ossn_user_by_guid($message->message_from);
+                        	echo ossn_plugin_view('chat/message-item-received', $vars);
+                    	}
                 }
             }
             ?>

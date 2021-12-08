@@ -2,9 +2,9 @@
 /**
  * Open Source Social Network
  *
- * @package   (softlab24.com).ossn
- * @author    OSSN Core Team <info@softlab24.com>
- * @copyright 2014-2017 SOFTLAB24 LIMITED
+ * @package   (openteknik.com).ossn
+ * @author    OSSN Core Team <info@openteknik.com>
+ * @copyright (C) OpenTeknik LLC
  * @license   Open Source Social Network License (OSSN LICENSE)  http://www.opensource-socialnetwork.org/licence
  * @link      https://www.opensource-socialnetwork.org/
  */
@@ -50,14 +50,6 @@ $tr = array(
 	'search:users' => 'Kişiler',
 	'admin:logout' => 'Çıkış Yap',
 	'logout' => 'Çıkış Yap',
-	
-	'ossn:like:this' => '%s bunu beğendi',
-	'ossn:like:you:and:this' => 'Sen ve %s bunu beğendi',
-	'ossn:like:people' => '%s İnsan',
-	'ossn:like:person' => '%s Kişi',
-	'ossn:liked:you' => 'Bunu beğendin',
-	'ossn:unlike' => 'Beğenmekten vazgeç',
-	'ossn:like' => 'Beğen',
 	
 	'admin:components' => 'Bileşenler',
 	'admin:dashboard' => 'Kontrol Paneli',
@@ -133,8 +125,30 @@ Bağlantı çalışmıyorsa kopyalayıp adres çubuğuna yapıştırarak deneyeb
 	'login:error' => 'Yanlış kullanıcı adı veya şifre!',
 	'login:error:sub' => "Giriş yapılamadı! Kullanıcı adı ve şifrenizi kontrol edin.",
 	'login:success' => 'Giriş yapıldı!',
-	'com:installed' => 'Bileşen, Bileşenler listesine yüklendi! Şimdi Bileşenler sayfasından etkinleştirebilirsiniz. ',
-	'com:install:error' => 'Bileşen yüklenemedi! Geçerli bir paket olduğundan emin olun.',
+	
+	'ossn:com:installer:create:tmpdir:error' => 'Geçici veri dizini oluşturulamıyor', 
+	'ossn:com:installer:upload:error' => 'Yükleme sırasında bir hata oluştu: %s',
+	'ossn:com:installer:version:error' => 'Bu bileşen OSSN %s veya üstü gerektirir',
+	'ossn:com:installer:remove:comdir:error' => 'Bu bileşen zaten yüklenmiş - lütfen önce bileşenler sayfasındaki listeden silin',
+	'ossn:com:installer:create:comdir:error' => 'Dosyalar bileşen dizinine kopyalanamıyor',
+	'ossn:com:installer:xml:incomplete:error' => 'Bileşen açıklama dosyası eksik veya eksik',
+	'ossn:com:installer:zip:incomplete:error' => 'Bileşen zip arşivi eksik',
+	'ossn:com:installer:open:zip:error' => 'Bileşen zip arşivi açılamıyor',
+	'ossn:com:installer:move:uploaded:file:error' => 'Geçersiz zip arşivi',
+	'ossn:com:installer:com:installation:success' => 'Bileşen, Bileşenler listesine yüklendi! Şimdi Bileşenler sayfasından etkinleştirebilirsiniz.',
+
+	'ossn:theme:installer:create:tmpdir:error' => 'Geçici veri dizini oluşturulamıyor', 
+	'ossn:theme:installer:upload:error' => 'Yükleme sırasında bir hata oluştu: %s',
+	'ossn:theme:installer:version:error' => 'Bu tema için Ossn %s veya üstü gerekir',
+	'ossn:theme:installer:remove:themedir:error' => 'Bu tema zaten yüklendi - lütfen önce temalar sayfasındaki listeden silin',
+	'ossn:theme:installer:create:themedir:error' => 'Dosyalar tema dizinine kopyalanamıyor',
+	'ossn:theme:installer:xml:incomplete:error' => 'Tema açıklama dosyası eksik veya eksik',
+	'ossn:theme:installer:zip:incomplete:error' => 'Tema zip arşivi eksik',
+	'ossn:theme:installer:open:zip:error' => 'Tema açılamıyor zip-archive',
+	'ossn:theme:installer:move:uploaded:file:error' => 'Geçersiz zip-archive',
+	'ossn:theme:installer:theme:installation:success' => 'Tema temalar listenize yüklendi, artık temalar sayfasından etkinleştirebilirsiniz.',
+	
+
 	'settings:saved' => 'Ayarlar kaydedildi!',
 	'com:deleted' => 'Bileşen silindi!',
 	'com:delete:error' => 'Bileşen silinemedi! Lütfen tekrar deneyin.',
@@ -293,11 +307,27 @@ Bağlantı çalışmıyorsa kopyalayıp adres çubuğuna yapıştırarak deneyeb
 	'admin:com:author:url' => 'Yapımcı URL',
 	'admin:com:license' => 'Lisans',
 	'admin:com:requirements' => 'Gereksinim',
-	'admin:com:availability' => 'Geçerlilik',
+	'admin:com:requirement' => 'gereklilik',
+	'admin:com:fulfilled' => 'Yerine getirilmiştir',
+	'admin:com:used:by' => 'Tarafından kullanılan',
 	'ossn:exception:make:sure' => 'Emin misiniz?',
 	'ossn:premium' => 'Ücretli Sürüm',
 	'datepicker:days' => "Pazar, Pazartesi, Salı, Çarşamba, Perşembe, Cuma, Cumartesi",
 	'datepicker:months' => "Ocak, Şubat, Mart, Nisan, Mayıs, Haziran, Temmuz, Ağustos, Eylül, Ekim, Kasım, Aralık",
+	'male:gendercolor' => '#01ADEF',
+	'female:gendercolor' => '#ED008C',
+	'ossn:admin:settings:off' => 'kapalı',
+	'ossn:admin:settings:on' => 'açık',
+	'ossn:admin:settings:saved' => 'Ayarlar kaydedildi!',
+	'ossn:admin:settings:save:error' => 'Ayarlar kaydedilemedi! Lütfen error_log dosyanızı kontrol edin.',
+	'php:upload_err_ok' => 'Hata yok, dosya başarıyla yüklendi',
+	'php:upload_err_ini_size' => 'Yüklenen dosya PHP.INI içindeki UPLOAD_MAX_FILESIZE yönergesini aşıyor.',
+	'php:upload_err_form_size' => 'Yüklenen dosya HTML formunda belirtilen MAX_FILE_SIZE yönergesini aşıyor',
+	'php:upload_err_partial' => 'Yüklenen dosya yalnızca kısmen yüklendi',
+	'php:upload_err_no_file' => 'Hiçbir dosya yüklenmedi',
+	'php:upload_err_no_tmp_dir' => 'Geçici klasör eksik',
+	'php:upload_err_cant_write' => 'dosya diske yazılamadı',
+	'php:upload_err_extension' => 'Bir PHP uzantısı dosya yüklemesini durdurdu',
 	/*
 	 * List of ISO 639-1 language codes
 	 * http://en.wikipedia.org/wiki/List_of_ISO_639-1_codes

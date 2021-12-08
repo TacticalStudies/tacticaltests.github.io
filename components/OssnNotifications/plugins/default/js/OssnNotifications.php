@@ -2,9 +2,9 @@
 /**
  * 	Open Source Social Network
  *
- * @package   (softlab24.com).ossn
- * @author    OSSN Core Team <info@softlab24.com>
- * @copyright 2014-2017 SOFTLAB24 LIMITED
+ * @package   (openteknik.com).ossn
+ * @author    OSSN Core Team <info@openteknik.com>
+ * @copyright (C) OpenTeknik LLC
  * @license   Open Source Social Network License (OSSN LICENSE)  http://www.opensource-socialnetwork.org/licence
  * @link      https://www.opensource-socialnetwork.org/
  */
@@ -29,14 +29,15 @@ Ossn.NotificationBox = function($title, $meta, $type, height, $extra) {
     }
 };
 Ossn.NotificationBoxClose = function() {
-    $('.ossn-notifications-box').hide()
+   $('.ossn-notifications-box').hide()
     $('.ossn-notifications-box').find('.type-name').html('');
-    $('.ossn-notifications-box').find('.metadata').html('<div><div class="ossn-loading ossn-notification-box-loading"></div></div><div class="bottom-all"><a href="#">'+Ossn.Print('see:all')+'</a></div>');
+    $('.ossn-notifications-box').find('.metadata').html('<div><div class="ossn-loading ossn-notification-box-loading"></div></div><div class="bottom-all">---</div>');
     //$('.ossn-notifications-box').css('height', '140px');
     $('.selected').attr('class', 'selected');
 
 };
 Ossn.NotificationShow = function($div) {
+	$('.ossn-notifications-box').show();
     $($div).attr('onClick', 'Ossn.NotificationClose(this)');
     Ossn.PostRequest({
         url: Ossn.site_url + "notification/notification",
@@ -70,6 +71,7 @@ Ossn.NotificationClose = function($div) {
 };
 
 Ossn.NotificationFriendsShow = function($div) {
+	$('.ossn-notifications-box').show();
     $($div).attr('onClick', 'Ossn.NotificationFriendsClose(this)');
     Ossn.PostRequest({
         url: Ossn.site_url + "notification/friends",
@@ -153,6 +155,7 @@ Ossn.removeFriendRequset = function($guid) {
 };
 
 Ossn.NotificationMessagesShow = function($div) {
+	$('.ossn-notifications-box').show();
     $($div).attr('onClick', 'Ossn.NotificationMessagesClose(this)');
     Ossn.PostRequest({
         url: Ossn.site_url + "notification/messages",
@@ -161,7 +164,7 @@ Ossn.NotificationMessagesShow = function($div) {
             Ossn.NotificationBoxClose();
             $('.ossn-notifications-notification').attr('onClick', 'Ossn.NotificationShow(this)');
             $('.ossn-notifications-friends').attr('onClick', 'Ossn.NotificationFriendsShow(this)');
-
+	    Ossn.NotificationBox(Ossn.Print('messages'), false, 'messages');
         },
         callback: function(callback) {
             var data = '';
@@ -238,7 +241,7 @@ Ossn.NotificationsCheck = function() {
 };
 Ossn.RegisterStartupFunction(function() {
     $(document).ready(function() {
-    		$('.ossn-topbar-dropdown-menu').click(function(){
+    		$('.ossn-topbar-dropdown-menu').on('click', function(){
                     Ossn.NotificationBoxClose();
         	});
 		$(document).on('click','.ossn-notification-mark-read', function(e){
@@ -260,6 +263,5 @@ Ossn.RegisterStartupFunction(function() {
         				}
     			 });
 		});
-		
     });
 });

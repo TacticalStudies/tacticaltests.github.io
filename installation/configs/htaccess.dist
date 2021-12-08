@@ -1,10 +1,10 @@
- # OpenSource-SocialNetwork
+ # Open Source Social Network
  #
- # @package   (Informatikon.com).ossn
+ # @package   .htaccess.ossn
  # @author    OSSN Core Team <info@opensource-socialnetwork.org>
- # @copyright 2014 iNFORMATIKON TECHNOLOGIES
- # @license   General Public Licence http://opensource-socialnetwork.org/licence 
- # @link      http://www.opensource-socialnetwork.org 
+ # @copyright (c) Engr. Syed Arsalan Hussain Shah (OpenTeknik LLC)
+ # @license   OPEN SOURCE SOCIAL NETWORK LICENSE https://opensource-socialnetwork.org/licence 
+ # @link      https://www.opensource-socialnetwork.org 
 
 Options -Indexes
 Options +SymlinksIfOwnerMatch
@@ -52,11 +52,11 @@ RewriteRule ^([A-Za-z0-9\_\-]+)\/(.*)$ index.php?h=$1&p=$2 [QSA,L]
 
 </IfModule>
 
-<IfModule mod_php5.c>
-	php_value memory_limit 128M
+<IfModule mod_php7.c>
+	php_value memory_limit 256M
 	php_value register_globals 0
-	php_value post_max_size 8388608
-	php_value upload_max_filesize 5242880
+	php_value post_max_size 50M
+	php_value upload_max_filesize 40M
 	php_value default_charset "UTF-8"
+	php_flag session.cookie_httponly on
 </IfModule>
-

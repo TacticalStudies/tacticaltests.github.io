@@ -2,9 +2,9 @@
 /**
  * Open Source Social Network
  *
- * @package   (softlab24.com).ossn
- * @author    OSSN Core Team <info@softlab24.com>
- * @copyright 2014-2017 SOFTLAB24 LIMITED
+ * @package   (openteknik.com).ossn
+ * @author    OSSN Core Team <info@openteknik.com>
+ * @copyright (C) OpenTeknik LLC
  * @license   Open Source Social Network License (OSSN LICENSE)  http://www.opensource-socialnetwork.org/licence
  * @link      https://www.opensource-socialnetwork.org/
  */
@@ -25,15 +25,14 @@ class OssnEntities extends OssnDatabase {
 						$this->permission = OSSN_PUBLIC;
 				}
 				
-				$this->types = array(
+				$this->types = ossn_call_hook('entities', 'types', false, array(
 						'object' => 'OssnObject',
 						'user' => 'OssnUser',
 						'annotation' => 'OssnAnnotation',
 						'entity' => 'OssnEntities',
 						'site' => 'OssnSite',
 						'component' => 'OssnComponents'
-				);
-				
+				));
 				//generate entity types from $this->types
 				foreach($this->types as $type => $class) {
 						$this->entity_types[] = $type;
@@ -48,7 +47,10 @@ class OssnEntities extends OssnDatabase {
 				if(empty($this->type)) {
 						$this->type = 'entity';
 				}
-				$this->data        = new stdClass;
+				if(!isset($this->subtype)){
+						$this->subtype = false;	
+				}
+				$this->data = new stdClass;
 				
 				if(!isset($this->offset)) {
 						$this->offset = 1;
@@ -96,7 +98,18 @@ class OssnEntities extends OssnDatabase {
 								$this->permission,
 								$this->active
 						);
+						$owner_guid  = $this->owner_guid;
+						$type	     = $this->type;
+						$subtype     = $this->subtype;
+						$timecreated = $this->time_created;
+						
 						if($this->insert($this->params)) {
+								//[B] Entities added via single DB connection may result in wrong last_id #1668
+								//As this supposed to be return a actual entity ID rather metadata guid
+								//so calling getLastEntry() after adding entity only make sense.
+								//if we call after metadata entry , it results metadata id not entity.
+								$this->inserted_entity_guid	= $this->getLastEntry();
+								
 								$this->params['into']   = 'ossn_entities_metadata';
 								$this->params['names']  = array(
 										'guid',
@@ -108,12 +121,13 @@ class OssnEntities extends OssnDatabase {
 								);
 								$this->insert($this->params);
 								
-								$args['owner_guid']   = $this->params['values'][0];
-								$args['type']         = $this->params['values'][1];
-								$args['subtype']      = $this->params['values'][2];
-								$args['time_created'] = $this->params['values'][3];
-								ossn_trigger_callback('entity', 'created', $args);								
-								return true;
+								$args['guid']	      = $this->inserted_entity_guid;
+								$args['owner_guid']   = $owner_guid;
+								$args['type']         = $type;
+								$args['subtype']      = $subtype;
+								$args['time_created'] = $timecreated;
+								ossn_trigger_callback('entity', 'created', $args);
+								return $this->inserted_entity_guid;
 						}
 				}
 				return false;
@@ -202,6 +216,10 @@ class OssnEntities extends OssnDatabase {
 						//code re arrange 1st July 2015 $arsalanshah
 						if(!empty($this->datavars)) {
 								$data_dbvars = $this->get_data_dbvars();
+								//PHP8 migration
+								if($data_dbvars === false){
+									$data_dbvars = array();	
+								}
 								foreach($this->datavars as $vars => $value) {
 										if(!in_array($vars, $data_dbvars)) {
 												$this->subtype = $vars;
@@ -227,8 +245,12 @@ class OssnEntities extends OssnDatabase {
 				if(!$this->data) {
 						return false;
 				}
+				$vars = array();
 				foreach($this->data as $name => $value) {
 						$vars[$name] = $value;
+				}
+				if(empty($vars)){
+					return false;	
 				}
 				return $vars;
 		}
@@ -264,7 +286,7 @@ class OssnEntities extends OssnDatabase {
 		 * @return integer
 		 */
 		public function AddedEntityGuid() {
-				return $this->getLastEntry();
+				return $this->inserted_entity_guid;
 		}
 		
 		/**
@@ -343,13 +365,17 @@ class OssnEntities extends OssnDatabase {
 				if(isset($this->guid) && !empty($this->guid) && empty($guid)) {
 						$guid = $this->guid;
 				}
-				if(empty($guid)){
-					return false;
+				if(empty($guid)) {
+						return false;
 				}
 				$params['from']   = 'ossn_entities';
 				$params['wheres'] = array(
 						"guid = '{$guid}'"
 				);
+				
+				$vars	= array();
+				$vars['entity'] = $guid;
+				ossn_trigger_callback('entity', 'before:delete', $vars);
 				
 				if($this->delete($params)) {
 						$metadata['from']   = 'ossn_entities_metadata';
@@ -447,6 +473,15 @@ class OssnEntities extends OssnDatabase {
 				} elseif(!empty($options['value']) && $options['search_type'] === false) {
 						$wheres[] = "emd.value = '{$options['value']}'";
 				}
+				if(isset($options['wheres']) && !empty($options['wheres'])) {
+						if(!is_array($options['wheres'])) {
+								$wheres[] = $options['wheres'];
+						} else {
+								foreach($options['wheres'] as $witem) {
+										$wheres[] = $witem;
+								}
+						}
+				}
 				$params             = array();
 				$params['from']     = 'ossn_entities as e';
 				$params['params']   = array(
@@ -472,13 +507,11 @@ class OssnEntities extends OssnDatabase {
 				}
 				if(isset($options['group_by']) && !empty($options['group_by'])) {
 						$params['group_by'] = $options['group_by'];
-				}					
+				}
 				//override params
-				if(isset($options['params']) && !empty($options['params'])){
+				if(isset($options['params']) && !empty($options['params'])) {
 						$params['params'] = $options['params'];
-				}				
-				$fetched_entities = $this->select($params, true);
-				
+				}
 				//prepare count data;
 				if($options['count'] === true) {
 						unset($params['params']);
@@ -490,6 +523,8 @@ class OssnEntities extends OssnDatabase {
 						$count           = array_merge($params, $count);
 						return $this->select($count)->total;
 				}
+				//load data after count condition #1316
+				$fetched_entities = $this->select($params, true);
 				if($fetched_entities) {
 						foreach($fetched_entities as $entity) {
 								//prepare entities for display
@@ -524,7 +559,7 @@ class OssnEntities extends OssnDatabase {
 		 *
 		 * @return void
 		 */
-		public function destruct(){
+		public function destruct() {
 				unset($this->types);
 				unset($this->entity_types);
 				unset($this->page_limit);
@@ -535,5 +570,5 @@ class OssnEntities extends OssnDatabase {
 				unset($this->order_by);
 				unset($this->active);
 				unset($this->limit);
-		}		
+		}
 } //class

@@ -2,9 +2,9 @@
 /**
  * Open Source Social Network
  *
- * @package   (softlab24.com).ossn
- * @author    OSSN Core Team <info@softlab24.com>
- * @copyright 2014-2017 SOFTLAB24 LIMITED
+ * @package   (openteknik.com).ossn
+ * @author    OSSN Core Team <info@openteknik.com>
+ * @copyright (C) OpenTeknik LLC
  * @license   Open Source Social Network License (OSSN LICENSE)  http://www.opensource-socialnetwork.org/licence
  * @link      https://www.opensource-socialnetwork.org/
  */
@@ -40,7 +40,7 @@ $romanian = array(
 	'all:files:required' => 'Toate dosarele sint  necesare! Verifica din nou.',
 	
 	'ossn:install:php' => 'PHP ',
-	'ossn:install:old:php' => "Ai o versiune veche de PHP " . PHP_VERSION . " Iti trebuie versiune PHP 5.4 or PHP 5.5",
+	'ossn:install:old:php' => "Ai o versiune veche de PHP " . PHP_VERSION . " Iti trebuie versiune PHP 7.0 or PHP 7.x",
 	
 	'ossn:install:mysqli' => 'MYSQLI ENABLED',
 	'ossn:install:mysqli:required' => 'MYSQLI PHP EXTENSION REQUIRED',
@@ -72,6 +72,7 @@ $romanian = array(
 	
 	'ossn:install:ziparchive' => 'PHP ZipArchive ENABLED',
 	'ossn:install:ziparchive:error' => 'PHP ZipArchive EXTENSION REQUIRED',
+	'ossn:install:cachedir:note:failed' => 'Asigurați-vă că fișierele și directoarele dvs. sunt deținute de un utilizator corect apache.',
 );
 
 ossn_installation_register_languages($romanian);

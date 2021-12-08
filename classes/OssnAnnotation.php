@@ -2,9 +2,9 @@
 /**
  * Open Source Social Network
  *
- * @package   (softlab24.com).ossn
- * @author    OSSN Core Team <info@softlab24.com>
- * @copyright 2014-2017 SOFTLAB24 LIMITED
+ * @package   (openteknik.com).ossn
+ * @author    OSSN Core Team <info@openteknik.com>
+ * @copyright (C) OpenTeknik LLC
  * @license   Open Source Social Network License (OSSN LICENSE)  http://www.opensource-socialnetwork.org/licence
  * @link      https://www.opensource-socialnetwork.org/
  */
@@ -26,8 +26,8 @@ class OssnAnnotation extends OssnEntities {
 				if(empty($this->order_by)) {
 						$this->order_by = '';
 				}
-				if(!isset($this->data)){
-					$this->data = new stdClass;
+				if(!isset($this->data)) {
+						$this->data = new stdClass;
 				}
 		}
 		/**
@@ -42,41 +42,51 @@ class OssnAnnotation extends OssnEntities {
 				if(empty($this->owner_guid) || empty($this->subject_guid) || empty($this->type)) {
 						return false;
 				}
-				$params['into']        = 'ossn_annotations';
-				$params['names']       = array(
+				$params['into']   = 'ossn_annotations';
+				$params['names']  = array(
 						'owner_guid',
 						'subject_guid',
 						'type',
 						'time_created'
 				);
-				$params['values']      = array(
+				$params['values'] = array(
 						$this->owner_guid,
 						$this->subject_guid,
 						$this->type,
 						$this->time_created
 				);
+				
 				$this->annotation_type = $this->type;
 				
 				$this->data->{$this->type} = $this->value;
+				$actual_value              = $this->value;
 				$this->owner_guid_old      = $this->owner_guid;
-				if($this->OssnDatabase->insert($params)) {
-						$this->annotation_inserted = $this->OssnDatabase->getLastEntry();
-						if(isset($this->data) && is_object($this->data)) {
-								foreach($this->data as $name => $value) {
-										$this->owner_guid = $this->annotation_inserted;
-										$this->type       = 'annotation';
-										$this->subtype    = $name;
-										$this->value      = $value;
-										$this->add();
+				
+				$create = ossn_call_hook('annotation', 'create', array(
+						'params' => $params,
+						'instance' => $this
+				), true);
+				if($create) {
+						if($this->OssnDatabase->insert($params)) {
+								$this->annotation_inserted = $this->OssnDatabase->getLastEntry();
+								if(isset($this->data) && is_object($this->data)) {
+										foreach($this->data as $name => $value) {
+												$this->owner_guid = $this->annotation_inserted;
+												$this->type       = 'annotation';
+												$this->subtype    = $name;
+												$this->value      = $value;
+												$this->add();
+										}
 								}
+								$params['value']           = $actual_value;
+								$params['subject_guid']    = $this->subject_guid;
+								$params['owner_guid']      = $this->owner_guid_old;
+								$params['type']            = $this->annotation_type;
+								$params['annotation_guid'] = $this->annotation_inserted;
+								ossn_trigger_callback('annotations', 'created', $params);
+								
+								return $this->annotation_inserted;
 						}
-						$params['subject_guid']    = $this->subject_guid;
-						$params['owner_guid']      = $this->owner_guid_old;
-						$params['type']            = $this->annotation_type;
-						$params['annotation_guid'] = $this->OssnDatabase->getLastEntry();
-						ossn_trigger_callback('annotations', 'created', $params);
-						
-						return $this->annotation_inserted;
 				}
 				return false;
 		}
@@ -132,8 +142,8 @@ class OssnAnnotation extends OssnEntities {
 				if(!isset($this->page_limit)) {
 						$this->page_limit = false;
 				}
-				if(empty($this->owner_guid)){
-					return false;
+				if(empty($this->owner_guid)) {
+						return false;
 				}
 				$params               = array();
 				$params['owner_guid'] = $this->owner_guid;
@@ -164,6 +174,10 @@ class OssnAnnotation extends OssnEntities {
 				$annotations        = $this->getAnnotationBySubject();
 				if($annotations) {
 						foreach($annotations as $annontation) {
+								if(class_exists('OssnLikes')){
+									$like = new OssnLikes;
+									$like->deleteLikes($annontation->id, 'annotation');
+								}
 								$this->deleteAnnotation($annontation->id);
 						}
 						return true;
@@ -206,14 +220,19 @@ class OssnAnnotation extends OssnEntities {
 		 *
 		 * @return boolean;
 		 */
-		public function deleteAnnotation($annotation) {
+		public function deleteAnnotation($annotation = 0) {
 				self::initAttributes();
-				if(isset($this->id)){
-					$annotation = $this->id;
+				if(isset($this->id)) {
+						$annotation = $this->id;
 				}
-				if(empty($annotation)){
-					return false;
+				if(empty($annotation)) {
+						return false;
 				}
+				
+				$vars	= array();
+				$params['annotation'] = $annotation;
+				ossn_trigger_callback('annotation', 'before:delete', $vars);				
+				
 				if($this->deleteByOwnerGuid($annotation, 'annotation')) {
 						$this->statement("DELETE FROM ossn_annotations WHERE(id='{$annotation}')");
 						if($this->execute()) {
@@ -243,6 +262,7 @@ class OssnAnnotation extends OssnEntities {
 						return false;
 				}
 				$this->owner_guid = $ownerguid;
+				$this->type = false;
 				$annotations      = $this->getAnnotationsByOwner();
 				if($annotations) {
 						foreach($annotations as $annotation) {
@@ -280,6 +300,7 @@ class OssnAnnotation extends OssnEntities {
 				$default      = array(
 						'search_type' => true,
 						'type' => false,
+						'distinct' => false,
 						'owner_guid' => false,
 						'annotation_id' => false,
 						'subject_guid' => false,
@@ -393,10 +414,9 @@ class OssnAnnotation extends OssnEntities {
 						$params['group_by'] = $options['group_by'];
 				}
 				//override params
-				if(isset($options['params']) && !empty($options['params'])){
+				if(isset($options['params']) && !empty($options['params'])) {
 						$params['params'] = $options['params'];
-				}					
-				$this->get = $this->select($params, true);
+				}
 				
 				//prepare count data;
 				if($options['count'] === true) {
@@ -409,6 +429,9 @@ class OssnAnnotation extends OssnEntities {
 						$count           = array_merge($params, $count);
 						return $this->select($count)->total;
 				}
+				//load fetch query after count condition #1316
+				$this->get = $this->select($params, true);
+				
 				if($this->get) {
 						foreach($this->get as $annotation) {
 								$merge = array(

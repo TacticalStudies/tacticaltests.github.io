@@ -59,7 +59,7 @@
     margin-left: 222px;
 }
 .ossn-photos .pthumb {
-    width: 200px;
+    width: 100%;
     height: 200px;
 }
 .ossn-photo-menu li {
@@ -87,4 +87,45 @@
 .ossn-photo-viewer .image-block {
 	text-align: center;
     min-height:200px;
+}
+.ossn-photos-add-button {
+    text-align: center;
+    padding: 20px;
+    margin-top: 30px;
+}	
+.ossn-photos-add-button .images {
+	display:none;
+}
+.ossn-photos-wall {
+    background: #f9f9f9;
+    margin-bottom: 10px;
+    padding-top: 10px;
+    border-radius: 2px;
+    border: 1px solid #eee;
+ 	text-align: center;   
+}
+.ossn-photos-wall-plain {
+	border:none;
+  	text-align: center;   
+    background:initial;
+}
+.ossn-photos-wall-title a{
+      font-weight: normal !important;
+}
+.ossn-photo-wall-item-small {
+    width:100px;
+}
+.ossn-photo-wall-item-medium {
+    width:200px;
+}
+.ossn-photos-wall-item {
+	display:inline-block !important;
+    cursor:pointer;
+    margin-right:2px;
+}
+.ossn-photo-view {
+	margin-bottom:10px;
+}
+#ossn-photos-show-gallery i {
+	margin-right:0;
 }

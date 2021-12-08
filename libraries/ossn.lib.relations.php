@@ -2,9 +2,9 @@
 /**
  * Open Source Social Network
  *
- * @package   (softlab24.com).ossn
- * @author    OSSN Core Team <info@softlab24.com>
- * @copyright 2014-2017 SOFTLAB24 LIMITED
+ * @package   (openteknik.com).ossn
+ * @author    OSSN Core Team <info@openteknik.com>
+ * @copyright (C) OpenTeknik LLC
  * @license   Open Source Social Network License (OSSN LICENSE)  http://www.opensource-socialnetwork.org/licence
  * @link      https://www.opensource-socialnetwork.org/
  */
@@ -76,6 +76,7 @@ function ossn_relation_exists($from, $to, $type, $recursive = false) {
  * Ossn get relationships
  *
  * @param array $params A options
+ * @Note inverse should only work perfectly one setting only one (to/from) parameter
  *
  * @return objects
  */
@@ -106,7 +107,8 @@ function ossn_get_relationships(array $params = array()) {
 								$wheres[] = "r1.type='{$params['type']}'";
 						}
 				}
-		} elseif(isset($params['to']) && !empty($params['to'])) {
+		} 
+		if(isset($params['to']) && !empty($params['to'])) {
 				if(isset($params['inverse'])) {
 						$vars['joins'] = array(
 								'JOIN ossn_relationships as r1 ON r1.relation_to=r.relation_from'
@@ -134,9 +136,19 @@ function ossn_get_relationships(array $params = array()) {
 		if(empty($params['type'])) {
 				return false;
 		}
+		if(isset($params['wheres']) && !empty($params['wheres'])) {
+				if(!is_array($params['wheres'])) {
+							$wheres[] = $params['wheres'];
+				} else {
+					foreach($params['wheres'] as $witem) {
+							$wheres[] = $witem;
+					}
+				}
+		}		
 		$default = array(
 				'page_limit' => 10,
 				'limit' => false,
+				'order_by' => false,
 				'offset' => input('offset', '', 1)
 		);
 		$options = array_merge($default, $params);
@@ -169,7 +181,6 @@ function ossn_get_relationships(array $params = array()) {
 				$count           = array_merge($vars, $count);
 				return $database->select($count)->total;
 		}
-
 		$vars['order_by'] = $options['order_by'];
 		$data = $database->select($vars, true);
 		if($data) {
@@ -198,6 +209,44 @@ function ossn_delete_relationship_by_id($id) {
 		return false;
 }
 /**
+ * Update relation by id
+ * [E] add option to update relation #1692
+ * 
+ * @param integer $id   ID for relationship
+ * @param array   $vars Option values (relation_from, relation_to, type, time) optional
+ *
+ * @return boolean
+ */
+function ossn_update_relationship_by_id($id, $vars = array()) {
+		if(!empty($id) && !empty($vars)){
+				$update           = new OssnDatabase;
+				$params['table']  = 'ossn_relationships';
+				$params['wheres'] = array(
+						"relation_id='{$id}'"
+				);
+				if(isset($vars['relation_from']) && !empty($vars['relation_from'])){
+					$params['names'][]  = 'relation_from';	
+					$params['values'][] = $vars['relation_from'];	
+				}
+				if(isset($vars['relation_to']) && !empty($vars['relation_to'])){
+					$params['names'][]  = 'relation_to';	
+					$params['values'][] = $vars['relation_to'];	
+				}	
+				if(isset($vars['type']) && !empty($vars['type'])){
+					$params['names'][]  = 'type';	
+					$params['values'][] = $vars['type'];	
+				}			
+				if(isset($vars['time']) && !empty($vars['time'])){
+					$params['names'][]  = 'time';	
+					$params['values'][] = $vars['time'];	
+				}							
+				if($update->update($params)){
+						return true;
+				}
+		}
+		return false;
+}
+/**
  * Ossn Delete Relation
  *
  * @param integer $id ID of the relationship
@@ -213,11 +262,11 @@ function ossn_delete_relationship(array $vars = array()) {
 		
 		$wheres[] = "relation_from='{$vars['from']}' AND relation_to='{$vars['to']}' AND type='{$vars['type']}'";
 		if(isset($vars['recursive'])) {
-				$wheres[] = "relation_to='{$vars['from']}' AND relation_from='{$vars['to']}' ADN type='{$vars['type']}'";
+				$wheres[] = "relation_to='{$vars['from']}' AND relation_from='{$vars['to']}' AND type='{$vars['type']}'";
 		}
 		$params['from']   = 'ossn_relationships';
 		$params['wheres'] = array(
-				$database->constructWheres($wheres)
+				$delete->constructWheres($wheres)
 		);
 		if($delete->delete($params)) {
 				return true;

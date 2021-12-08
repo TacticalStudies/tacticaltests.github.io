@@ -1,4 +1,5 @@
 User-agent: *
+Disallow: /cache/
 Disallow: /actions/
 Disallow: /classes/
 Disallow: /configurations/
@@ -7,4 +8,5 @@ Disallow: /locale/
 Disallow: /system/
 Disallow: /vendors/
 Disallow: /themes/
+Disallow: /upgrade/
 

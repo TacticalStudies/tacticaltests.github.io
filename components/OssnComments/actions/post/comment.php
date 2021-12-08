@@ -2,9 +2,9 @@
 /**
  * Open Source Social Network
  *
- * @package Open Source Social Network
- * @author    Open Social Website Core Team <info@softlab24.com>
- * @copyright 2014-2017 SOFTLAB24 LIMITED
+ * @package   Open Source Social Network
+ * @author    Open Social Website Core Team <info@openteknik.com>
+ * @copyright (C) OpenTeknik LLC
  * @license   Open Source Social Network License (OSSN LICENSE)  http://www.opensource-socialnetwork.org/licence
  * @link      https://www.opensource-socialnetwork.org/
  */
@@ -31,6 +31,7 @@ if($OssnComment->PostComment($post, ossn_loggedin_user()->guid, $comment)) {
 						'comment' => $data,
 						'process' => 1
 				));
+				exit;
 		}
 } else {
 		if(!ossn_is_xhr()) {
@@ -40,5 +41,6 @@ if($OssnComment->PostComment($post, ossn_loggedin_user()->guid, $comment)) {
 				echo json_encode(array(
 						'process' => 0
 				));
+				exit;
 		}
 }

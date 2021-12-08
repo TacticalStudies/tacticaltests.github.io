@@ -4,9 +4,9 @@
  *
  * Translated by Zaturnay - https://zaturnay.com.ve
  *
- * @package   (softlab24.com).ossn
- * @author    OSSN Core Team <info@softlab24.com>
- * @copyright 2014-2017 SOFTLAB24 LIMITED
+ * @package   (openteknik.com).ossn
+ * @author    OSSN Core Team <info@openteknik.com>
+ * @copyright (C) OpenTeknik LLC
  * @license   Open Source Social Network License (OSSN LICENSE)  http://www.opensource-socialnetwork.org/licence
  * @link      https://www.opensource-socialnetwork.org/
  */
@@ -52,14 +52,6 @@ $es = array(
 	'search:users' => 'Personas',
 	'admin:logout' => 'Cerrar sesión',
 	'logout' => 'Cerrar sesión',
-	
-	'ossn:like:this' => '%s le gusta esto',
-	'ossn:like:you:and:this' => 'Tu y %s le gusta esto',
-	'ossn:like:people' => '%s Personas',
-	'ossn:like:person' => '%s Persona',
-	'ossn:liked:you' => 'Te gustó esto',
-	'ossn:unlike' => 'No me gusta',
-	'ossn:like' => 'Me gusta',
 	
 	'admin:components' => 'Componentes',
 	'admin:dashboard' => 'Tablero',
@@ -135,8 +127,29 @@ Puede copiar y pegar la dirección a su navegador manualmente en caso de que el 
 	'login:error' => '¡Usuario o contraseña invalido!',
 	'login:error:sub' => 'No pudimos iniciar sesión. Por favor, compruebe su nombre de usuario o contraseña y vuelva a intentarlo.',
 	'login:success' => 'Ahora está conectado!',
-	'com:installed' => 'El componente se ha cargado en la lista de componentes, ahora puede habilitarlo desde la página de componentes.',
-	'com:install:error' => 'No se puede cargar el componente, asegúrese de que es un paquete válido.',
+	
+	'ossn:com:installer:create:tmpdir:error' => 'No se puede crear un directorio de datos temporal', 
+	'ossn:com:installer:upload:error' => 'Se produjo un error durante la carga: %s',
+	'ossn:com:installer:version:error' => 'Este componente requiere OSSN %s o superior',
+	'ossn:com:installer:remove:comdir:error' => 'Este componente ya se ha instalado; primero bórrelo de la lista en la página de componentes',
+	'ossn:com:installer:create:comdir:error' => 'No se pueden copiar archivos al directorio de componentes',
+	'ossn:com:installer:xml:incomplete:error' => 'Falta el archivo de descripción del componente o está incompleto',
+	'ossn:com:installer:zip:incomplete:error' => 'Componente zip-archive incompleto',
+	'ossn:com:installer:open:zip:error' => 'No se puede abrir el archivo zip del componente',
+	'ossn:com:installer:move:uploaded:file:error' => 'Archivo zip inválido',
+	'ossn:com:installer:com:installation:success' => 'El componente se ha cargado en la lista de componentes, ahora puede habilitarlo desde la página de componentes.',
+	
+	'ossn:theme:installer:create:tmpdir:error' => 'No se puede crear un directorio de datos temporal', 
+	'ossn:theme:installer:upload:error' => 'Se produjo un error durante la carga: %s',
+	'ossn:theme:installer:version:error' => 'Este tema requiere Ossn %s o superior',
+	'ossn:theme:installer:remove:themedir:error' => 'Este tema ya se ha instalado; primero bórrelo de la lista en la página de temas',
+	'ossn:theme:installer:create:themedir:error' => 'No se pueden copiar archivos al directorio de temas',
+	'ossn:theme:installer:xml:incomplete:error' => 'Falta el archivo de descripción del tema o está incompleto',
+	'ossn:theme:installer:zip:incomplete:error' => 'Tema zip-archivo incompleto',
+	'ossn:theme:installer:open:zip:error' => 'No se puede abrir el archivo zip del tema',
+	'ossn:theme:installer:move:uploaded:file:error' => 'Archivo zip inválido',
+	'ossn:theme:installer:theme:installation:success' => 'El tema se ha subido a su lista de temas, ahora puede habilitarlo desde la página de temas.',
+	
 	'settings:saved' => 'Ajustes guardados',
 	'com:deleted' => '¡El componente ha sido eliminado!',
 	'com:delete:error' => 'No se puede eliminar el componente! Por favor, inténtelo de nuevo más tarde.',
@@ -293,11 +306,26 @@ Haga clic en el enlace de abajo para restablecer la contraseña o copie y pegue 
 	'admin:com:author:url' => 'Autor URL',
 	'admin:com:license' => 'Licencia',
 	'admin:com:requirements' => 'Requerimientos',
-	'admin:com:availability' => 'Disponibilidad',
+	'admin:com:requirement' => 'Requisito',
+	'admin:com:fulfilled' => 'Cumplido',
 	'ossn:exception:make:sure' => '¿Estás seguro?',
 	'ossn:premium' => 'Versión Premium',
 	'datepicker:days' => "Su, Mo, Tu, We, Th, Fr, Sa",
 	'datepicker:months' => "Ene., Feb., Mar., Abr., Mayo, Junio, Julio, Ago., Sep., Oct., Nov., Dec.",
+	'male:gendercolor' => '#01ADEF',
+	'female:gendercolor' => '#ED008C',
+	'ossn:admin:settings:off' => 'desactivado',
+	'ossn:admin:settings:on' => 'activado',
+	'ossn:admin:settings:saved' => '¡Ajustes guardados!',
+	'ossn:admin:settings:save:error' => '¡No se puede guardar la configuración! Por favor, compruebe su archivo error_log.',
+	'php:upload_err_ok' => 'No hay error, el archivo cargado con éxito',
+	'php:upload_err_ini_size' => 'El archivo cargado supera la directiva UPLOAD_MAX_FILESIZE en PHP.INI',
+	'php:upload_err_form_size' => 'El archivo cargado supera la directiva MAX_FILE_SIZE que se especificó en el formulario HTML',
+	'php:upload_err_partial' => 'El archivo cargado solo se cargó parcialmente',
+	'php:upload_err_no_file' => 'Ningun archivo fue subido',
+	'php:upload_err_no_tmp_dir' => 'Falta una carpeta temporal',
+	'php:upload_err_cant_write' => 'Error al escribir el archivo en el disco',
+	'php:upload_err_extension' => 'Una extensión PHP detuvo la carga del archivo',
 	/*
 	 * List of ISO 639-1 language codes
 	 * http://en.wikipedia.org/wiki/List_of_ISO_639-1_codes

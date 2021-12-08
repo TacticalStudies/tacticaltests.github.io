@@ -4,9 +4,9 @@
  *
  * Translated by Zaturnay - https://zaturnay.com.ve
  *
- * @package Open Source Social Network
- * @author    Open Social Website Core Team <info@softlab24.com>
- * @copyright 2014-2017 SOFTLAB24 LIMITED
+ * @package   Open Source Social Network
+ * @author    Open Social Website Core Team <info@openteknik.com>
+ * @copyright (C) OpenTeknik LLC
  * @license   Open Source Social Network License (OSSN LICENSE)  http://www.opensource-socialnetwork.org/licence
  * @link      https://www.opensource-socialnetwork.org/
  */
@@ -65,5 +65,14 @@ $es = array(
 	
 	'group:deleted' => 'Contenido del grupo y grupo eliminado',
 	'group:delete:fail' => 'No se pudo eliminar el grupo',	
+
+	'group:delete:cover' => 'Borrar Portada',	
+	'group:delete:cover:error' => 'Se ha producido un error al eliminar la imagen de portada',
+	'group:delete:cover:success' => 'La imagen de portada se ha eliminado correctamente',
+	
+	//need translation
+    'group:memb:make:owner' => 'Make group owner',
+    'group:memb:make:owner:confirm' => 'Attention! This action will make >> %s << the new owner of the group and you will lose all of your group admin privileges. Are you sure to proceed?',
+    'group:memb:make:owner:admin:confirm' => 'Attention! This action will make >> %s << the new owner of the group and the former owner will lose all of his group admin privileges. Are you sure to proceed?',	
 );
 ossn_register_languages('es', $es); 

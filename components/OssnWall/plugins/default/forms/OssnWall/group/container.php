@@ -2,9 +2,9 @@
 /**
  *    OpenSource-SocialNetwork
  *
- * @package   (softlab24.com).ossn
+ * @package   (openteknik.com).ossn
  * @author    OSSN Core Team <info@opensource-socialnetwork.com>
- * @copyright 2014-2017 SOFTLAB24 LIMITED
+ * @copyright (C) OpenTeknik LLC
  * @license   General Public Licence http://opensource-socialnetwork.com/licence
  * @link      http://www.opensource-socialnetwork.com/licence
  */
@@ -30,14 +30,17 @@
         <?php
 			echo ossn_view_menu('wall/container/controls/group', 'wall/menus/container_controls'); 
 		?>      
-        <div style="float:right;">
+    </div>
+    <div class='ossn-wall-post-button-container'>
             <div class="ossn-loading ossn-hidden"></div>
             <input class="btn btn-primary ossn-wall-post" type="submit" value="<?php echo ossn_print('post'); ?>" />
-        </div>
-        <li class="ossn-wall-privacy">
-            <div class="ossn-wall-privacy-lock"></div>
-            <span><i class="fa fa-lock"></i><span class="hidden-xs"><?php echo ossn_print('privacy'); ?></span></span>
-        </li>
-    </div>
+    </div>  
+    <div class="ossn-wall-privacy-dummy">
+    		<?php if($params['group']['group']->membership == OSSN_PUBLIC){ ?>
+            <span title="<?php echo ossn_print('privacy:group:public');?>"><i class="ossn-wall-privacy-lock fa fa-lock"></i><span class=""><?php echo ossn_print('public'); ?></span></span>
+            <?php } else {?>
+            <span title="<?php echo ossn_print('privacy:group:close');?>"><i class="ossn-wall-privacy-lock fa fa-lock"></i><span class=""><?php echo ossn_print('close'); ?></span></span>            
+            <?php } ?> 
+    </div>          
 	 <input type="hidden" value="<?php echo $params['group']['group']->guid; ?>" name="wallowner"/>
 </div>

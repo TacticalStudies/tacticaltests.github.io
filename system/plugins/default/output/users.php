@@ -2,9 +2,9 @@
 /**
  * Open Source Social Network
  *
- * @package   (softlab24.com).ossn
- * @author    OSSN Core Team <info@softlab24.com>
- * @copyright 2014-2017 SOFTLAB24 LIMITED
+ * @package   (openteknik.com).ossn
+ * @author    OSSN Core Team <info@openteknik.com>
+ * @copyright (C) OpenTeknik LLC
  * @license   Open Source Social Network License (OSSN LICENSE)  http://www.opensource-socialnetwork.org/licence
  * @link      https://www.opensource-socialnetwork.org/
  */
@@ -16,7 +16,7 @@ if ($users) {
             	<div class="col-md-2 col-sm-2 hidden-xs">
     	        		<img src="<?php echo $user->iconURL()->large; ?>" width="100" height="100"/>
 				</div>
-                <div class="col-md-10 col-sm-10 col-xs-12">
+                <div class="col-md-10 col-sm-10 col-12">
 	    	        <div class="uinfo">
                         <?php
 							echo ossn_plugin_view('output/url', array(

@@ -3,9 +3,9 @@
 /**
  * Open Source Social Network
  *
- * @package   (softlab24.com).ossn
- * @author    OSSN Core Team <info@softlab24.com>
- * @copyright 2014-2017 SOFTLAB24 LIMITED
+ * @package   (openteknik.com).ossn
+ * @author    OSSN Core Team <info@openteknik.com>
+ * @copyright (C) OpenTeknik LLC
  * @license   Open Source Social Network License (OSSN LICENSE)  http://www.opensource-socialnetwork.org/licence
  * @link      https://www.opensource-socialnetwork.org/
  */
@@ -75,22 +75,24 @@ class OssnProfile extends OssnDatabase {
 				             subtype='cover_position');");
         $this->execute();
         $entity = $this->fetch();
-        $position = array(
-            '',
-            ''
-        );
+	if($entity){
+        	$position = array(
+        	    '',
+        	    ''
+        	);
 
-        $fields = new OssnEntities;
-        $fields->owner_id = $guid;
-        $fields->guid = $entity->guid;
-        $fields->type = 'user';
+        	$fields = new OssnEntities;
+        	$fields->owner_id = $guid;
+        	$fields->guid = $entity->guid;
+        	$fields->type = 'user';
 
-        $fields->subtype = 'cover_position';
-        $fields->value = json_encode($position);
-        if ($fields->updateEntity()) {
-            return true;
-        }
-        return false;
+        	$fields->subtype = 'cover_position';
+        	$fields->value = json_encode($position);
+        	if ($fields->updateEntity()) {
+        	    return true;
+        	}
+        	return false;
+	}
     }
 
     /**
@@ -129,7 +131,8 @@ class OssnProfile extends OssnDatabase {
 		$this->wall->poster_guid = $ownerguid;
 		$this->wall->item_guid = $itemguid;
 		
-		if($this->wall->Post('null:data')){
+		//[E] Check if profile and cover posted on newsfeed as public #1991
+		if($this->wall->Post('null:data', '', '', OSSN_FRIENDS)){
 			return true;
 		}
 	}
@@ -183,7 +186,9 @@ class OssnProfile extends OssnDatabase {
 				$user->data->cover_time = $user->cover_time;
 				$user->save();
 			}
-			return ossn_site_url("cover/{$user->username}/".md5($user->cover_time).'.jpg');
+			$url  = ossn_site_url("cover/{$user->username}/".md5($user->cover_time).'.jpg');
+			//[B] img js ossn_cache cause duplicate requests #1886
+			return ossn_add_cache_to_url($url);
 		}
 		return false;
 	}

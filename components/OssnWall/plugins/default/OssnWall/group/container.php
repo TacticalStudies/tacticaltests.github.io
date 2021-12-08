@@ -2,9 +2,9 @@
 /**
  *    OpenSource-SocialNetwork
  *
- * @package   (softlab24.com).ossn
+ * @package   (openteknik.com).ossn
  * @author    OSSN Core Team <info@opensource-socialnetwork.com>
- * @copyright 2014-2017 SOFTLAB24 LIMITED
+ * @copyright (C) OpenTeknik LLC
  * @license   General Public Licence http://opensource-socialnetwork.com/licence
  * @link      http://www.opensource-socialnetwork.com/licence
  */
@@ -33,7 +33,7 @@
        <i class="fa fa-map-marker"></i>
     </li>
     <li class="ossn-wall-photo">
-       <i class="fa fa-picture-o"></i>
+       <i class="fa fa-image"></i>
     </li>
     <div style="float:right;">
         <input type="hidden" value="<?php echo $params['group']['group']->guid; ?>" name="wallowner"/>

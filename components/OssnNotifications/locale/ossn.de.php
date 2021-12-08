@@ -2,14 +2,15 @@
 /**
  * Open Source Social Network
  *
- * @package   (softlab24.com).ossn
- * @author    OSSN Core Team <info@softlab24.com>
- * @copyright 2014-2017 SOFTLAB24 LIMITED
+ * @package   (openteknik.com).ossn
+ * @author    OSSN Core Team <info@openteknik.com>
+ * @copyright (C) OpenTeknik LLC
  * @license   Open Source Social Network License (OSSN LICENSE)  http://www.opensource-socialnetwork.org/licence
  * @link      https://www.opensource-socialnetwork.org/
  */
 
 $de = array(
+	'ossnnotifications' => 'Benachrichtigungen',
     'ossn:notifications:comments:post' => "%s hat den Beitrag kommentiert",
     'ossn:notifications:like:post' => "%s gefällt Dein Beitrag",
     'ossn:notifications:like:annotation' => "%s gefällt Dein Kommentar",
@@ -37,5 +38,7 @@ $de = array(
     'ossn:notification:mark:read:error' => 'Es kann nicht alles als gelesen markiert werden',
     
     'ossn:notifications:mark:as:read' => 'Alles als gelesen markieren',
+	'ossn:notifications:admin:settings:close_anywhere:title' => 'Benachrichtigungs-Fenster schließen durch Klicken auf eine beliebige Stelle',
+	'ossn:notifications:admin:settings:close_anywhere:note' => '<i class="fa fa-info-circle"></i> schließt alle Benachrichtigungsfenster, wenn man auf eine beliebige Stelle auf der Seite klickt<br><br>',
 );
 ossn_register_languages('de', $de); 

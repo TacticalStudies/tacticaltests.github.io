@@ -2,11 +2,18 @@
 /**
  *    OpenSource-SocialNetwork
  *
- * @package   (softlab24.com).ossn
+ * @package   (openteknik.com).ossn
  * @author    OSSN Core Team <info@opensource-socialnetwork.com>
- * @copyright 2014-2017 SOFTLAB24 LIMITED
+ * @copyright (C) OpenTeknik LLC
  * @license   General Public Licence http://opensource-socialnetwork.com/licence
  * @link      http://www.opensource-socialnetwork.com/licence
  */
-echo '<div style="font-size:12px;">' . ossn_print('post:select:privacy') . '</div>';
-echo ossn_plugin_view('input/privacy');
+echo '<p>' . ossn_print('post:select:privacy') . '</p>';
+echo ossn_plugin_view('input/privacy', array(
+		'value' => OSSN_PUBLIC,											 
+));
+?>
+<script>
+$('#ossn-wall-privacy-container input[name="privacy"]').attr('checked', false);
+$('#ossn-wall-privacy-container input[value=' + $('#ossn-wall-privacy').val() + ']').attr('checked', true);
+</script>

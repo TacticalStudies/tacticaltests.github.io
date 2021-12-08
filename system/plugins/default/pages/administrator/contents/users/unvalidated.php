@@ -2,29 +2,28 @@
 /**
  * Open Source Social Network
  *
- * @package   (softlab24.com).ossn
- * @author    OSSN Core Team <info@softlab24.com>
- * @copyright 2014-2017 SOFTLAB24 LIMITED
+ * @package   (openteknik.com).ossn
+ * @author    OSSN Core Team <info@openteknik.com>
+ * @copyright (C) OpenTeknik LLC
  * @license   Open Source Social Network License (OSSN LICENSE)  http://www.opensource-socialnetwork.org/licence
  * @link      https://www.opensource-socialnetwork.org/
  */
 $users      = new OssnUser;
-$pagination = new OssnPagination;
 $search = input('search_users');
 
-$data = $users->getUnvalidatedUSERS($search);
-
-$pagination->setItem($data);
-$list = $pagination->getItem();
-
+$list = $users->getUnvalidatedUSERS($search);
+$count = $users->getUnvalidatedUSERS($search, 'count');
 ?>
 <div class="row">
+	<div class="col-md-12">
     <form method="post">
         <input type="text" name="search_users" placeholder="<?php echo ossn_print('search'); ?>" />
         <input type="submit" class="btn btn-primary" value="<?php echo ossn_print('search'); ?>"/>
     </form>    
+    </div>
 </div>
 <div class="row margin-top-10">
+<div class="col-md-12">
 <table class="table ossn-users-list">
     <tbody>
     <tr class="table-titles">
@@ -38,8 +37,7 @@ $list = $pagination->getItem();
     </tr>
     <?php
 if($list) {
-		foreach($pagination->getItem() as $user) {
-				$user      = ossn_user_by_guid($user->guid);
+		foreach($list as $user) {
 ?>
         <tr>
             <td>
@@ -61,7 +59,6 @@ if($list) {
 ?>
     </tbody>
 </table>
+<?php echo ossn_view_pagination($count); ?>
 </div>
-<div class="row">
-	<?php echo $pagination->pagination(); ?>
 </div>

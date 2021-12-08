@@ -2,15 +2,19 @@
 /**
  * Open Source Social Network
  *
- * @package   (softlab24.com).ossn
- * @author    OSSN Core Team <info@softlab24.com>
- * @copyright 2014-2017 SOFTLAB24 LIMITED
+ * @package   (openteknik.com).ossn
+ * @author    OSSN Core Team <info@openteknik.com>
+ * @copyright (C) OpenTeknik LLC
  * @license   Open Source Social Network License (OSSN LICENSE)  http://www.opensource-socialnetwork.org/licence
  * @link      https://www.opensource-socialnetwork.org/
  */
 ?>
-<label><?php echo ossn_print('photo:select'); ?></label>
-<input type="file" name="ossnphoto"/>
+<div class="ossn-photos-add-button">
+	<input type="file" name="ossnphoto[]" multiple class="hidden"/>
+	<button type="button" id="ossn-photos-add-button-inner" class="btn btn-default btn-lg"><i class="fa fa-copy"></i> <?php echo ossn_print('photo:select'); ?></button>
+    <div class="images"><i class="fa fa-image"></i> <span class="count">0</span></div>
+</div>
+
 <input type="submit" class="ossn-hidden" id="ossn-photos-submit"/>
 <?php
 // Shouldn't album privacy applied on photos? $dev.arsalan

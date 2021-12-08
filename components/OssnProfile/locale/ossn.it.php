@@ -2,9 +2,9 @@
 /**
  * Open Source Social Network
  *
- * @package Open Source Social Network
- * @author    Open Social Website Core Team <info@softlab24.com>
- * @copyright 2014-2017 SOFTLAB24 LIMITED
+ * @package   Open Source Social Network
+ * @author    Open Social Website Core Team <info@openteknik.com>
+ * @copyright (C) OpenTeknik LLC
  * @license   Open Source Social Network License (OSSN LICENSE)  http://www.opensource-socialnetwork.org/licence
  * @link      https://www.opensource-socialnetwork.org/
  */
@@ -23,6 +23,6 @@ $en = array(
 		'profile:photos' => 'Foto profilo',
 		
 		'profile:cover:err1' => 'L\'immagine di cover è troppo piccola',
-		'profile:cover:err1:detail' => 'L\'immagina di cover deve essere almeno 850 x 300 o più grande.'
+		'profile:cover:err1:detail' => 'L\'immagina di cover deve essere almeno 1040 x 300 o più grande.'
 );
 ossn_register_languages('it', $en);

@@ -2,26 +2,33 @@
 /**
  * Open Source Social Network
  *
- * @package   (softlab24.com).ossn
- * @author    OSSN Core Team <info@softlab24.com>
- * @copyright 2014-2017 SOFTLAB24 LIMITED
+ * @package   (openteknik.com).ossn
+ * @author    OSSN Core Team <info@openteknik.com>
+ * @copyright (C) OpenTeknik LLC
  * @license   Open Source Social Network License (OSSN LICENSE)  http://www.opensource-socialnetwork.org/licence
  * @link      https://www.opensource-socialnetwork.org/
  */
 ?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
+<!DOCTYPE html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
     <title><?php echo $params['title']; ?></title>
     <link rel="stylesheet" href="./styles/ossn.install.css"/>
+    <link rel="icon" href="./styles/favicon.ico?ossn_cache" type="image/x-icon" />
 </head>
 
 <body>
 <div class="ossn-header">
     <div class="inner">
         <div class="logo-installation"></div>
+        <img class="settings" src="./styles/settings.jpg" />
+    </div>
+</div>
+<div id="ossn-page-menubar">
+	<div class="inner">
+	    <li><a href="#"><?php echo ossn_installation_print("ossn:installation"); ?></a></li>
+   		<li><a href="#"> > </a></li>
+  	 	<li><a href="#"><?php echo $params['title']; ?></a></li>
     </div>
 </div>
 <div style="margin:0 auto; width:1000px;">
@@ -37,17 +44,10 @@
             </table>
 
         </div>
-        <div id="ossn-page-menubar">
-            <li><a href="#"><?php echo ossn_installation_print("ossn:installation"); ?></a></li>
-            <li><a href="#"> > </a></li>
-            <li><a href="#"><?php echo $params['title']; ?></a></li>
-            </li>
-
-        </div>
     </div>
     <div>
 
-        <div>
+        <div class="ossn-installation-message-marg">
             <?php
             echo ossn_installation_messages();?>
         </div>

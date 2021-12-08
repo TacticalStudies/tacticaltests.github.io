@@ -2,9 +2,9 @@
 /**
  * Open Source Social Network
  *
- * @package   (softlab24.com).ossn
- * @author    OSSN Core Team <info@softlab24.com>
- * @copyright 2014-2017 SOFTLAB24 LIMITED
+ * @package   (openteknik.com).ossn
+ * @author    OSSN Core Team <info@openteknik.com>
+ * @copyright (C) OpenTeknik LLC
  * @license   Open Source Social Network License (OSSN LICENSE)  http://www.opensource-socialnetwork.org/licence
  * @link      https://www.opensource-socialnetwork.org/
  */
@@ -18,10 +18,15 @@ function ossn_generate_action_token($timestamp){
 	if(!isset($timestamp) && empty($timestamp)){
 		$timestamp = time();
 	}
-	$site_screat = ossn_site_settings('site_key');
+	$site_secret = ossn_site_settings('site_key');
 	$session_id = session_id();
-	$user_guid  = ossn_loggedin_user()->guid;
-	return md5($timestamp . $site_screat . $session_id . $user_guid);
+	//PHP8 "Attempt to read property "guid" on bool" in file
+	$user       = ossn_loggedin_user();
+	$user_guid  = false;
+	if($user){
+		$user_guid  = $user->guid;
+	}
+	return hash('sha256', $timestamp . $site_secret . $session_id . $user_guid);
 }
 /**
  * Build url from parts

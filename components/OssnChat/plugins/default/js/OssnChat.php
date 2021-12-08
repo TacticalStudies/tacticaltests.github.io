@@ -1,9 +1,10 @@
+//<script>
 /**
  * 	Open Source Social Network
  *
- * @package   (softlab24.com).ossn
- * @author    OSSN Core Team <info@softlab24.com>
- * @copyright 2014-2017 SOFTLAB24 LIMITED
+ * @package   (openteknik.com).ossn
+ * @author    OSSN Core Team <info@openteknik.com>
+ * @copyright (C) OpenTeknik LLC
  * @license   Open Source Social Network License (OSSN LICENSE)  http://www.opensource-socialnetwork.org/licence
  * @link      https://www.opensource-socialnetwork.org/
  */
@@ -49,7 +50,7 @@ Ossn.ChatOpenTab = function($user) {
         $tabitem.find('input[type="text"]').show();
         $('#ftab' + $user).removeClass('ossn-chat-tab-active');
         $tabitem.find('.ossn-chat-new-message').hide();
-        $tabitem.find('.ossn-chat-new-message').empty();           
+        $tabitem.find('.ossn-chat-new-message').empty();
         Ossn.ChatScrollMove($user);
     }
 };
@@ -60,9 +61,9 @@ Ossn.ChatCloseTab = function($user) {
     $tabitem.css('width', '200px');
     $tabitem.find('input[type="text"]').hide();
     $tabitem.removeClass('ossn-chat-tab-active');
-	// close emoji container if still open because no emoji has been selected
-	$('#master-moji-anchor').val('');
-	$('#master-moji .emojii-container-main').hide();
+    // close emoji container if still open because no emoji has been selected
+    $('#master-moji-anchor').val('');
+    $('#master-moji .emojii-container-main').hide();
 };
 Ossn.ChatTerminateTab = function($user) {
     return Ossn.CloseChat($user);
@@ -82,17 +83,17 @@ Ossn.ChatSendForm = function($user) {
     Ossn.ajaxRequest({
         url: Ossn.site_url + "action/ossnchat/send",
         form: '#ossn-chat-send-' + $user,
-        
+
         beforeSend: function(request) {
-             var $input = $('#ossn-chat-send-' + $user).find("input[type='text']");
+            var $input = $('#ossn-chat-send-' + $user).find("input[type='text']");
             //chat: annoying procedure on pressing just [Enter] without any input #651
-            if(!$.trim($input.val())){
-           		$('#ftab-i' + $user).find('.ossn-chat-message-sending').hide();
+            if (!$.trim($input.val())) {
+                $('#ftab-i' + $user).find('.ossn-chat-message-sending').hide();
                 $('#ftab-i' + $user).find('input[name="message"]').val('');
                 request.abort();
             } else {
-	            $('#ftab-i' + $user).find('.ossn-chat-message-sending').show();
-             }
+                $('#ftab-i' + $user).find('.ossn-chat-message-sending').show();
+            }
         },
         callback: function(callback) {
             if (callback['type'] == 1) {
@@ -111,7 +112,7 @@ Ossn.ChatnewTab = function($user) {
         action: false,
         callback: function(callback) {
             if ($('#ftab-i' + $user).length == 0) {
-                if ($(".ossn-chat-containers").children(".friend-tab-item").size() < 4) {
+                if ($(".ossn-chat-containers").children(".friend-tab-item").length < 4) {
                     $('.ossn-chat-containers').append(callback);
                 }
             }
@@ -148,7 +149,92 @@ Ossn.ChatScrollMove = function(fid) {
         return message.scrollTop;
     }
 };
-
 Ossn.ChatExpand = function($username) {
     window.location = Ossn.site_url + 'messages/message/' + $username;
 };
+//message with user pagination
+Ossn.ChatLoading = function($friend_guid) {
+	$(document).ready(function(e) {
+		e.preventDefault;
+		var offset      = 1;
+		var old_offset  = offset;
+		var last_offset = 0;
+		var msg_window  = $('#ossn-chat-messages-data-' + $friend_guid);
+		var pagination  = $('#ossn-chat-messages-data-' + $friend_guid + ' .container-table-pagination');
+		if(pagination.length) {
+			offset = 2;
+			$last = pagination.find('.ossn-pagination').find('li:last');
+			$last_url = $last.find('a').attr('href');
+			last_offset = Ossn.MessagesURLparam('offset_message_xhr_with_' + $friend_guid, $last_url);
+		} else {
+			return;
+		}
+		const SCROLLBAR_ADJUSTMENT = 190;
+		var client_height;
+		var scroll_height;
+		var scroll_top;
+		var scroll_pos = 0;
+		var old_scroll_pos = 0;
+	
+		const MAX_MESSAGES_PER_LOAD = 10;
+		var messages_loaded;
+		var messages_displayed;
+		var messages_xhr_inserted;
+	
+		msg_window.scroll(function(event) {
+			event.stopImmediatePropagation();
+			client_height  = parseInt(msg_window[0].clientHeight);
+			scroll_height  = parseInt(msg_window[0].scrollHeight);
+			scroll_top     = parseInt(msg_window[0].scrollTop);
+			scroll_pos     = scroll_height - client_height - scroll_top;
+			old_scroll_pos = scroll_height - client_height;
+		
+			if (scroll_pos >= old_scroll_pos && offset > old_offset && offset <= last_offset) {
+				old_scroll_pos = scroll_pos;
+				old_offset     = offset;
+			
+				messages_loaded = (offset - 1) * MAX_MESSAGES_PER_LOAD;
+				messages_displayed  = msg_window.find("[id^=ossn-message-item-]").length;
+				messages_xhr_inserted = messages_displayed - messages_loaded;
+			
+				$url = '?offset_message_xhr_with_' + $friend_guid + '=' + offset;
+				$user_guid = $friend_guid;
+				Ossn.PostRequest({
+					url: Ossn.site_url + 'ossnchat/load' + $url + '&guid=' + $user_guid,
+					beforeSend: function() {
+						msg_window.prepend('<div class="ossn-messages-with-pagination-loading"><div class="ossn-loading"></div></div>').fadeIn();
+					},
+					callback: function(callback) {
+						$element = $(callback);
+						if ($element.length) {
+							offset++;
+							$last = $element.find('.ossn-pagination').find('li:last');
+							$last_url = $last.find('a').attr('href');
+							last_offset = Ossn.MessagesURLparam('offset_message_xhr_with_' + $friend_guid, $last_url);
+							if(messages_xhr_inserted) {
+								var messages = $element.find("[id^=ossn-message-item-]");
+								for (var i = 0; i < messages.length; i++) {
+									var msg_id = $(messages[i]).attr('id');
+									if(msg_window.find('#' + msg_id).length) {
+										$element.find('#' + msg_id).remove();
+									}
+								}
+							}
+							$clone = $element.find('.container-table-pagination').html();
+							$element.find('.container-table-pagination').remove(); //remove pagination from contents as we'll replace contents of already existing pagination.
+							msg_window.prepend($element.html()); //append the new data
+							pagination.html($clone); //set pagination content with new pagination contents
+							pagination.prependTo(msg_window); //append the pagnation back to at end
+						}
+						msg_window.find('.ossn-messages-with-pagination-loading').remove();
+						if(offset > last_offset) {
+							pagination.remove();
+						} else {
+							msg_window.animate({scrollTop: SCROLLBAR_ADJUSTMENT}, 0);
+						}
+					},
+				});
+			}
+		});
+	});
+}

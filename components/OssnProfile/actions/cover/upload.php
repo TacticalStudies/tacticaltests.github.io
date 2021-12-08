@@ -2,9 +2,9 @@
 /**
  * Open Source Social Network
  *
- * @package   (softlab24.com).ossn
- * @author    OSSN Core Team <info@softlab24.com>
- * @copyright 2014-2017 SOFTLAB24 LIMITED
+ * @package   (openteknik.com).ossn
+ * @author    OSSN Core Team <info@openteknik.com>
+ * @copyright (C) OpenTeknik LLC
  * @license   Open Source Social Network License (OSSN LICENSE)  http://www.opensource-socialnetwork.org/licence
  * @link      https://www.opensource-socialnetwork.org/
  */
@@ -21,11 +21,15 @@ $file->setExtension(array(
 		'jpg',
 		'png',
 		'jpeg',
+		'jfif',
 		'gif'
 ));
-if($file->addFile()) {
+if($fileguid = $file->addFile()) {
 		//update user cover time, this time has nothing to do with photo entity time
 		$user->data->cover_time = time();
+		//default cover photo #1647
+		$user->data->cover_guid = $fileguid;
+		
 		$user->save();
 		
 		$newcover    = $file->getFiles();
@@ -33,6 +37,8 @@ if($file->addFile()) {
 		$ossnprofile->ResetCoverPostition($file->owner_guid);
 		$ossnprofile->addPhotoWallPost($file->owner_guid, $newcover->{0}->guid, 'cover:photo');
 		echo 1;
+		exit;
 } else {
 		echo 0;
+		exit;
 }

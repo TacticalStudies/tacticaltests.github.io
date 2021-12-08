@@ -2,9 +2,9 @@
 /**
  * Open Source Social Network
  *
- * @package   (softlab24.com).ossn
- * @author    OSSN Core Team <info@softlab24.com>
- * @copyright 2014-2017 SOFTLAB24 LIMITED
+ * @package   (openteknik.com).ossn
+ * @author    OSSN Core Team <info@openteknik.com>
+ * @copyright (C) OpenTeknik LLC
  * @license   Open Source Social Network License (OSSN LICENSE)  http://www.opensource-socialnetwork.org/licence
  * @link      https://www.opensource-socialnetwork.org/
  */
@@ -18,7 +18,7 @@
 	   $inner_text = $params['text'].' ';
    }
   if($params['privacy'] == OSSN_PUBLIC){
-	echo "<span {$class} title='{$text}'>{$inner_text}<i class='fa fa-globe'></i></span>";  
+	echo "<span {$class} title='{$text}'>{$inner_text}<i class='fa fa-globe-americas'></i></span>";  
   } elseif($params['privacy'] == OSSN_FRIENDS){
 	echo "<span {$class} title='{$text}'>{$inner_text}<i class='fa fa-users'></i></span>";  	  
   } elseif($params['privacy'] == OSSN_PRIVATE){

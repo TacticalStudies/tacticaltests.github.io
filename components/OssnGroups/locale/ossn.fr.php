@@ -3,8 +3,8 @@
  * Open Source Social Network
  *
  * @package   Open Source Social Network
- * @author    Open Social Website Core Team <info@softlab24.com>
- * @copyright 2014-2017 SOFTLAB24 LIMITED
+ * @author    Open Social Website Core Team <info@openteknik.com>
+ * @copyright (C) OpenTeknik LLC
  * @license   Open Source Social Network License (OSSN LICENSE)  http://www.opensource-socialnetwork.org/licence
  * @link      https://www.opensource-socialnetwork.org/
  */
@@ -63,5 +63,14 @@ $fr = array(
 	
 	'group:deleted' => 'Groupe et contenu du groupe supprimé',
 	'group:delete:fail' => 'Le groupe ne peut pas être supprimé',	
+
+	'group:delete:cover' => 'Supprimer la photo de couverture',
+	'group:delete:cover:error' => "Une erreur s'est produite lors de la suppression de l'image de couverture",
+	'group:delete:cover:success' => "L'image de couverture a été supprimée avec succès",
+	
+	//need translation
+    'group:memb:make:owner' => 'Make group owner',
+    'group:memb:make:owner:confirm' => 'Attention! This action will make >> %s << the new owner of the group and you will lose all of your group admin privileges. Are you sure to proceed?',
+    'group:memb:make:owner:admin:confirm' => 'Attention! This action will make >> %s << the new owner of the group and the former owner will lose all of his group admin privileges. Are you sure to proceed?',	
 );
 ossn_register_languages('fr', $fr); 

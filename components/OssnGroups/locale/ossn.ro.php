@@ -2,9 +2,9 @@
 /**
  * Open Source Social Network
  *
- * @package Open Source Social Network
- * @author    Open Social Website Core Team <info@softlab24.com>
- * @copyright 2014-2017 SOFTLAB24 LIMITED
+ * @package   Open Source Social Network
+ * @author    Open Social Website Core Team <info@openteknik.com>
+ * @copyright (C) OpenTeknik LLC
  * @license   Open Source Social Network License (OSSN LICENSE)  http://www.opensource-socialnetwork.org/licence
  * @link      https://www.opensource-socialnetwork.org/
  */
@@ -63,5 +63,14 @@ $ro = array(
 	
 	'group:deleted' => 'Grupul si continutul a fost sters',
 	'group:delete:fail' => 'Grupul nu a putut fii sters',	
+
+	'group:delete:cover' => 'Sterge copertă',
+	'group:delete:cover:error' => 'A apărut o eroare la ștergerea imaginii de copertă',
+	'group:delete:cover:success' => 'Imaginea de copertă a fost ștearsă cu succes',
+	
+	//need translation
+    'group:memb:make:owner' => 'Make group owner',
+    'group:memb:make:owner:confirm' => 'Attention! This action will make >> %s << the new owner of the group and you will lose all of your group admin privileges. Are you sure to proceed?',
+    'group:memb:make:owner:admin:confirm' => 'Attention! This action will make >> %s << the new owner of the group and the former owner will lose all of his group admin privileges. Are you sure to proceed?',		
 );
 ossn_register_languages('ro', $ro); 

@@ -2,9 +2,9 @@
 /**
  * Open Source Social Network
  *
- * @package Open Source Social Network
- * @author    Open Social Website Core Team <info@softlab24.com>
- * @copyright 2014-2017 SOFTLAB24 LIMITED
+ * @package   Open Source Social Network
+ * @author    Open Social Website Core Team <info@openteknik.com>
+ * @copyright (C) OpenTeknik LLC
  * @license   Open Source Social Network License (OSSN LICENSE)  http://www.opensource-socialnetwork.org/licence
  * @link      https://www.opensource-socialnetwork.org/
  */
@@ -17,5 +17,8 @@ $de = array(
     'user:unblock:error' => 'Der Benutzer kann nicht entsperrt werden',	
     'ossn:blocked:error' => 'Gesperrt',
     'ossn:blocked:error:note' => 'Du kannst diese Seite nicht sehen, weil dich der Benutzer gesperrt hat.',	
+	
+	'ossn:profile:edit:tab' => 'Gesperrte Benutzer',
+	'ossn:profile:list:text' => 'Dies ist die Liste von Benutzern, die du gesperrt hast.',	
 );
 ossn_register_languages('de', $de); 

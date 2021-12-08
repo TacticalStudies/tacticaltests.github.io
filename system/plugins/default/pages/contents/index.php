@@ -2,9 +2,9 @@
 /**
  * Open Source Social Network
  *
- * @package   (softlab24.com).ossn
- * @author    OSSN Core Team <info@softlab24.com>
- * @copyright 2014-2017 SOFTLAB24 LIMITED
+ * @package   (openteknik.com).ossn
+ * @author    OSSN Core Team <info@openteknik.com>
+ * @copyright (C) OpenTeknik LLC
  * @license   Open Source Social Network License (OSSN LICENSE)  http://www.opensource-socialnetwork.org/licence
  * @link      https://www.opensource-socialnetwork.org/
  */
@@ -12,7 +12,11 @@
 <div class="row ossn-page-contents">
 		<div class="col-md-6 home-left-contents">
 			<div class="logo">
+            	<?php if(ossn_site_settings('cache') == true){?>
             	<img src="<?php echo ossn_theme_url();?>images/logo.png" />
+                <?php } else { ?>
+            	<img src="<?php echo ossn_theme_url();?>images/logo.png?v=<?php echo time();?>" />                
+                <?php } ?>
             </div>	
             <div class="description">
             	<?php echo ossn_print('home:top:heading', array(ossn_site_settings('site_name'))); ?>
@@ -23,11 +27,11 @@
             </div>
            	 <ul  class="some-icons">
                 	<li><i class="fa fa-users"></i></li>
-                	<li><i class="fa fa-comments-o"></i></li>
+                	<li><i class="fa fa-comments"></i></li>
                 	<li><i class="fa fa-envelope"></i></li>
-                	<li><i class="fa fa-globe"></i></li>
-                	<li><i class="fa fa-picture-o"></i></li>
-                	<li><i class="fa fa-video-camera"></i></li>
+                	<li><i class="fa fa-globe-americas"></i></li>
+                	<li><i class="fa fa-image"></i></li>
+                	<li><i class="fa fa-video"></i></li>
                 	<li><i class="fa fa-map-marker"></i></li>
                 	<li><i class="fa fa-calendar"></i></li>
              </ul>

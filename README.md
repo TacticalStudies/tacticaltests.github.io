@@ -1,90 +1,92 @@
-Open Source Social Network [5.0-DEV] 
+Open Source Social Network [6.2 LTS -DEV]
 ======================================
-[![Open Source Love](https://badges.frapsoft.com/os/v2/open-source.svg?v=102)](https://github.com/ellerbrock/open-source-badge/)
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com)
-[![Build Status](https://travis-ci.org/opensource-socialnetwork/opensource-socialnetwork.svg?branch=v4.x)](https://travis-ci.org/opensource-socialnetwork/opensource-socialnetwork)
+[![Open Source Love](https://badges.frapsoft.com/os/v2/open-source.svg?v=102)](https://www.opensource-socialnetwork.org/)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](https://www.opensource-socialnetwork.org/)
+[![Download Latest](https://img.shields.io/badge/Download-Latest%20Version-blue.svg)](https://www.opensource-socialnetwork.org/download)
 
-Opensource-Socialnetwork (OSSN) is a social networking software written in PHP. It allows you to make a social networking website and helps your members build social relationships, with people who share similar professional or personal interests.
+[![Build Status](https://travis-ci.org/opensource-socialnetwork/opensource-socialnetwork.svg?branch=v5.x)](https://travis-ci.org/opensource-socialnetwork/opensource-socialnetwork)
+[![DeepScan grade](https://deepscan.io/api/teams/4774/projects/6525/branches/54923/badge/grade.svg)](https://deepscan.io/dashboard#view=project&tid=4774&pid=6525&bid=54923)
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/88c6ef38f593440cafe7ba350e592649)](https://www.codacy.com/gh/opensource-socialnetwork/opensource-socialnetwork/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=opensource-socialnetwork/opensource-socialnetwork&amp;utm_campaign=Badge_Grade)
 
-OSSN is released under the ***Open Source Social Network License (OSSN LICENSE) v3.0***
+Opensource-Socialnetwork (OSSN) is a social networking software written in PHP. It allows you to make a social networking website and helps your members build social relationships, with people who share similar professional or personal interests. It is available in 17 international languages.
+
+OSSN Licensed under the ***Open Source Social Network License (4.0) / Cryptographic Autonomy License version 1.0***
+
+Kernighan & Ritchie (K&R Variant 1TBS) indentation standard is used for the OSSN.
+
+- Copyright (C) 2014-2022 ENGR. SYED ARSALAN HUSSAIN SHAH <arsalan@buddyexpress.net>,
+- Copyright (C) 2014-2022 OPEN SOURCE SOCIAL NETWORK <https://www.opensource-socialnetwork.org>,
+- Copyright (C) 2021-2022 OPEN TEKNIK LLC <https://www.openteknik.com>,
+- Copyright (C) 2021-2022 OPENHOST247 LLC <https://www.openhost247.com>,
+- Copyright (C) 2015-2021 SOFTLAB24 LTD <https://www.softlab24.com>
+- Copyright (C) 2014-2015 INFORMATIKON TECHNOLOGIES <https://www.informatikon.com>
+
+| Landing Page | Newsfeed | Profile Page |
+|:-------------------------:|:-------------------------:|:-------------------------:|
+|<img width="665" alt="open source social network landing page" src="https://www.opensource-socialnetwork.org/themes/default/images/s1.png?ossn_cache=c0ddf768">| <img width="665" alt="open source social network newsfeed" src="https://www.opensource-socialnetwork.org/themes/default/images/s5.52.png?ossn_cache=c0ddf768"> | <img width="665" alt="open source social network profile page" src="https://www.opensource-socialnetwork.org/themes/default/images/s2.png?ossn_cache=c0ddf768">|
+
+Visit https://www.opensource-socialnetwork.org/ for more details 
+
 
 Languages
 ==========
-* English
-* German
-* French
-* Romanian
-* Portuguese
-* Turkish
-* Spanish
-* Italian
+
+|  |  |  |
+|:-------------------------:|:-------------------------:|:-------------------------:|
+| English |German | Romanian | 
+| French | Portuguese | Turkish |
+| Spanish | Italian | Russian | 
+| Dutch | Hebrew | Greek |
+| Esperanto | Japanese | Indonesian |
+| Traditional Chinese | Korean | 
 
 Front-End Features
 ===================
-* User Registration
-* User Login
-* Profile 
-* Profile Photo
-* Profile Cover
-* Add/Remove Friends
-* Live Chat
-* Wall posts
-* Photos
-* Ads
-* Groups
-* Tag friends in posts
-* User block system
-* User poke system
-* Ajax Comments
-* Ajax Likes
-* Ajax Photos in comments
-* Group cover photos
-* Repostion Profile/Group cover
-* Notifications
-* Friend Requests
-* Chat Bar
-* Invite Friends
-* Embed Videos
-* Smilies
-* SitePages (terms, privacy, about)
-* Site Search
-* Reset Password
-* Newsfeed page
-* Post Edit
-* Comment Edit
-* Mobile Friendly
-* A photo gallery view.
-* Emojii Support
+
+| Feature | Feature |  Feature |  
+|:-------------------------:|:-------------------------:|:-------------------------:|
+| User Registration  | User Login | Profile |
+| Profile Cover | Profile Photo | Profile Friends | 
+| Friends Management | Live Chat | Messaging | 
+| Wall Posts | Albums | Photos | Ads | 
+| Groups | Friends Tagging | Block System | 
+| Poke System | Comments | Likes and Reactions |
+| Expense Mangement | Giphy Integeration in Comments |  Invite Friends | 
+| Embed Videos | Smiles & Emojis | Site Pages (Terms, about, privacy) |
+| Mobile Responsive |  Notifications | Search | 
+| Gallery | Post Background | Realtime Comments | 
+| Realtime Messages | Blogs | Themes on community |
+| Mentions in comments | Custom Pages | Custom Menu Items |
+| Captcha | Site Announcements | Greetings | 
+| Login as | Progressive Web App | Microsoft Active Directory Login |
+| Giphy Integeration | Many free components of community website |
 
 Backend Features
 =================
 
 * Admin Dashboard for site overview
-* Online users count (male/female) graph
+* Online users count, gender based graph
 * Total site users count (by months) graph
-* Update Notification
+* Component configurations 
 * Add User
 * Remove User
 * Edit User
 * Ads Manager
-* Site Cache Settings
-* Site Basic Settings
+* Cache Settings
+* Basic Settings
 * Unvalidated users
+* Custom pages
+* Menu Builder
+* Themes management
+* Components Management
+* WebServices API
 * Manually validate unvalidated users
 * and much more components settings
 
 Prerequisite
 =============
-* PHP 5.6 OR >
-* MYSQL 5.6 OR >
-* APACHE
-* MOD_REWRITE
-* PHP Function cURL
-* PHP GD Library
-* PHP ZIP Extension
-* PHP settings allow_url_fopen enabled
-* JSON Support
-* XML
+
+https://www.opensource-socialnetwork.org/wiki/view/706/how-to-install-open-source-social-network
 
 Directory Permissions
 ============
@@ -101,6 +103,15 @@ Installation
 ============
 https://www.opensource-socialnetwork.org/wiki/view/706/how-to-install-open-source-social-network
 
+- Web Installer https://www.opensource-socialnetwork.org/download
+- VM Image - https://www.opensource-socialnetwork.org/download-vm-image
+
+Installation on Ubuntu x64 18.04/20.04/21.04 LTS (Experimental) 
+```
+sudo add-apt-repository ppa:arsalanshah/opensource-socialnetwork
+sudo apt-get update
+sudo apt-get install opensource-socialnetwork
+```
 DEMO
 ====
 http://demo.opensource-socialnetwork.org/
@@ -108,10 +119,3 @@ http://demo.opensource-socialnetwork.org/
 UPGRADE
 ========
 https://www.opensource-socialnetwork.org/wiki/view/708/how-to-upgrade-ossn
-
-
-Copyright 2014-2016 Informatikon Technologies (informatikon.com)
-
-Copyright 2016-2017 SOFTLAB24 (https://www.softlab24.com/)
-
-Copyright 2014-2017 Open Source Social Network (https://www.opensource-socialnetwork.org/)

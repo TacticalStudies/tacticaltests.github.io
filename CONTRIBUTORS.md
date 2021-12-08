@@ -1,15 +1,8 @@
 The following developers contributed to this project:
 
-* Ethel M. Ward
-* Sophia Mahler
+* Tuomas Venhola
 * Sathish Kumar
 * Arsalan Shah
-* Mike Wagner
-* Ralph Pfeifer
-* Uwe Kaestner
-* Jerry L. McCord
-* Anthony E. Sikora
-* Charles E. Lawler
 * Shaf Brady Hussain
 * Softaculous Team
 * Michael Zülsdorff
@@ -20,3 +13,13 @@ The following developers contributed to this project:
 * Julien Jehannet (https://github.com/jjehannet)
 * Tomáš Votruba (https://github.com/TomasVotruba)
 * Eric F. (https://www.opensource-socialnetwork.org/u/ctlui)
+* Kevin Breen (https://github.com/kevthehermit)
+* Muh Arief Ikhsan Yafi (https://web.facebook.com/muharief.iy)
+* James Chang(https://www.opensource-socialnetwork.org/u/zuyan)
+* Alexander 손은석 | Hanmesoft Corporation (http://www.hanmesoft.com)
+* l3afblow3r | https://github.com/l3afblow3r
+* Haydar Alkaduhimi (https://www.opensource-socialnetwork.org/u/haydar)
+* ystartgo (https://github.com/ystartgo)
+* AntzCode (https://github.com/AntzCode)
+* Benjamin Oldenburg (https://github.com/ordisbold)
+* Zaxxo https://github.com/zaxxo  https://www.zaxxo.de

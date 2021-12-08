@@ -2,9 +2,9 @@
 /**
  * Open Source Social Network
  *
- * @package Open Source Social Network
- * @author    Open Social Website Core Team <info@softlab24.com>
- * @copyright 2014-2017 SOFTLAB24 LIMITED
+ * @package   Open Source Social Network
+ * @author    Open Social Website Core Team <info@openteknik.com>
+ * @copyright (C) OpenTeknik LLC
  * @license   Open Source Social Network License (OSSN LICENSE)  http://www.opensource-socialnetwork.org/licence
  * @link      https://www.opensource-socialnetwork.org/
  */
@@ -23,7 +23,12 @@ function ossn_profile() {
 		ossn_register_page('cover', 'cover_page_handler');
 		//css and js
 		ossn_extend_view('css/ossn.default', 'css/profile');
-		ossn_extend_view('js/opensource.socialnetwork', 'js/OssnProfile');
+		ossn_extend_view('js/ossn.site', 'js/OssnProfile');
+		//birthdays JS for both admin and site
+		//[B] datepicker missing on admin backed OSSN 6.0 dev $githubertus
+		ossn_extend_view('js/ossn.site.public', 'js/profile/birthdate');
+		ossn_extend_view('js/ossn.admin', 'js/profile/birthdate');
+		
 		//actions
 		if(ossn_isLoggedin()) {
 				ossn_register_action('profile/photo/upload', __OSSN_PROFILE__ . 'actions/photo/upload.php');
@@ -74,6 +79,12 @@ function ossn_profile() {
 						'parent' => 'links',
 						'icon' => $icon
 				));
+				
+				ossn_register_menu_item('profile/edit/tabs', array(
+							'name' => 'basic',
+							'href' => '?section=basic',
+							'text' => ossn_print('basic:settings'),
+				));									
 		}
 }
 /**
@@ -150,6 +161,7 @@ function profile_user_friends($hook, $type, $return, $params) {
 function profile_edit_page($hook, $type, $return, $params) {
 		$page = $params['subpage'];
 		if($page == 'edit') {
+				$section 	  = input('section', '', 'basic');
 				$user['user'] = $params['user'];
 				if($user['user']->guid !== ossn_loggedin_user()->guid) {
 						redirect(REF);
@@ -161,10 +173,12 @@ function profile_edit_page($hook, $type, $return, $params) {
 						'params' => $user
 				);
 				$form   = ossn_view_form('edit', $params, false);
-				echo ossn_set_page_layout('module', array(
-						'title' => ossn_print('edit'),
-						'content' => $form
-				));
+				$params['section']  = $section;
+				
+				$args['user']    = $user['user'];
+				$args['section'] = $section;
+				$params['contents'] = ossn_call_hook('profile', 'edit:section', $args, $form);
+				echo ossn_plugin_view('profile/edit', $params);
 		}
 }
 /**
@@ -175,13 +189,27 @@ function profile_edit_page($hook, $type, $return, $params) {
 function profile_search_handler($hook, $type, $return, $params) {
 		$Pagination    = new OssnPagination;
 		$users         = new OssnUser;
-		$data          = $users->searchUsers(array(
-				'wheres' => "CONCAT(u.first_name, ' ', u.last_name) LIKE '%{$params['q']}%'"
-		));
-		$count         = $users->searchUsers(array(
-				'wheres' => "CONCAT(u.first_name, ' ', u.last_name) LIKE '%{$params['q']}%'",
-				'count' => true
-		));
+		//[E] Blocked user showing in search and people can add friends #2008
+		if(ossn_isLoggedin() && com_is_active('OssnBlock')){
+			$loggedin      = ossn_loggedin_user();
+			$blocked       = "(u.guid NOT IN (SELECT DISTINCT relation_to FROM `ossn_relationships` WHERE relation_from={$loggedin->guid} AND type='userblock') AND u.guid NOT IN (SELECT 	DISTINCT relation_from FROM `ossn_relationships` WHERE relation_to={$loggedin->guid} AND type='userblock'))";
+			
+			$data          = $users->searchUsers(array(
+					'wheres' => "(CONCAT(u.first_name, ' ', u.last_name) LIKE '%{$params['q']}%') AND {$blocked}"
+			));
+			$count         = $users->searchUsers(array(
+					'wheres' => "(CONCAT(u.first_name, ' ', u.last_name) LIKE '%{$params['q']}%') AND {$blocked}",
+					'count' => true
+			));
+		} else {
+			$data          = $users->searchUsers(array(
+					'wheres' => "CONCAT(u.first_name, ' ', u.last_name) LIKE '%{$params['q']}%'"
+			));
+			$count         = $users->searchUsers(array(
+					'wheres' => "CONCAT(u.first_name, ' ', u.last_name) LIKE '%{$params['q']}%'",
+					'count' => true
+			));			
+		}
 		$user['users'] = $data;
 		$search        = ossn_plugin_view('output/users', $user);
 		$search .= ossn_view_pagination($count);
@@ -284,8 +312,10 @@ function get_profile_photo($user, $size) {
 		}
 		
 		$photo = $user->getProfilePhoto();
-		$etag  = $photo->guid . $photo->time_created;
-		
+		$etag  = time();
+		if($photo){
+			$etag  = $photo->guid . $photo->time_created;
+		}
 		if(isset($photo->time_created)) {
 				header("Last-Modified: " . gmdate('D, d M Y H:i:s \G\M\T', $photo->time_created));
 		}
@@ -296,7 +326,7 @@ function get_profile_photo($user, $size) {
 				exit;
 		}
 		
-		if(isset($photo->value) && !empty($photo->value)) {
+		if($photo && isset($photo->value) && !empty($photo->value)) {
 				$datadir = ossn_get_userdata("user/{$user->guid}/{$photo->value}");
 				if(!empty($size)) {
 						$image   = str_replace('profile/photo/', '', $photo->value);
@@ -330,8 +360,11 @@ function get_cover_photo($user, $params = array()) {
 				return false;
 		}
 		$photo = $user->getProfileCover();
-		$etag  = $photo->guid . $photo->time_created;
-		
+		$etag  = time();
+		if($photo){
+			$etag  = $photo->guid . $photo->time_created;
+		}
+			
 		if(isset($_SERVER['HTTP_IF_NONE_MATCH']) && trim($_SERVER['HTTP_IF_NONE_MATCH']) == "\"$etag\"") {
 				header("HTTP/1.1 304 Not Modified");
 				exit;
@@ -491,7 +524,7 @@ function ossn_profile_photo_wall_url($photo) {
 						'profile/photo/'
 				), '', $photo->value);
 				$image     = ossn_site_url("album/getphoto/{$photo->owner_guid}/{$imagefile}?type=1");
-				return $image;
+				return ossn_add_cache_to_url($image);
 		}
 		return false;
 }
@@ -506,7 +539,7 @@ function ossn_profile_coverphoto_wall_url($photo) {
 						'profile/cover/'
 				), '', $photo->value);
 				$image     = ossn_site_url("album/getcover/{$photo->owner_guid}/{$imagefile}");
-				return $image;
+				return ossn_add_cache_to_url($image);
 		}
 		return false;
 }
@@ -532,25 +565,31 @@ function ossn_profile_delete_photo_wallpost($callback, $type, $params) {
  * @return boolean|void
  */
 function ossn_profile_images_allcomments($callback, $type, $params) {
-		if(!class_exists('OssnComments')) {
-				return false;
-		}
-		ossn_unregister_menu('commentall', 'entityextra');
-		switch($params['entity']->subtype) {
-				case 'file:profile:photo':
-						$url = ossn_site_url("photos/user/view/{$params['entity']->guid}");
-						break;
-				case 'file:profile:cover':
-						$url = ossn_site_url("photos/cover/view/{$params['entity']->guid}");
-						break;
-		}
-		$comment = new OssnComments;
-		if($comment->countComments($params['entity']->guid, 'entity') > 5) {
-				ossn_register_menu_item('entityextra', array(
-						'name' => 'commentall',
-						'href' => $url,
-						'text' => ossn_print('comment:view:all')
-				));
+		if(class_exists('OssnComments')) {
+				ossn_unregister_menu('commentall', 'entityextra');
+				switch($params['entity']->subtype) {
+						case 'file:profile:photo':
+								$url = ossn_site_url("photos/user/view/{$params['entity']->guid}");
+								break;
+						case 'file:profile:cover':
+								$url = ossn_site_url("photos/cover/view/{$params['entity']->guid}");
+								break;
+						case 'file:ossn:aphoto':
+								$url = ossn_site_url("photos/view/{$params['entity']->guid}");
+								break;
+						default:
+								$url = false;
+				}
+				if($url) {
+						$comment = new OssnComments;
+						if($comment->countComments($params['entity']->guid, 'entity') > 5 && !$params['full_view']) {
+								ossn_register_menu_item('entityextra', array(
+										'name' => 'commentall',
+										'href' => $url,
+										'text' => ossn_print('comment:view:all')
+								));
+						}
+				}
 		}
 }
 ossn_register_callback('ossn', 'init', 'ossn_profile');

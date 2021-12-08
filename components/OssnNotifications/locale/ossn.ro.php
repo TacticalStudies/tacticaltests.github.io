@@ -2,14 +2,15 @@
 /**
  * Open Source Social Network
  *
- * @package   (softlab24.com).ossn
- * @author    OSSN Core Team <info@softlab24.com>
- * @copyright 2014-2017 SOFTLAB24 LIMITED
+ * @package   (openteknik.com).ossn
+ * @author    OSSN Core Team <info@openteknik.com>
+ * @copyright (C) OpenTeknik LLC
  * @license   Open Source Social Network License (OSSN LICENSE)  http://www.opensource-socialnetwork.org/licence
  * @link      https://www.opensource-socialnetwork.org/
  */
 
 $ro = array(
+	'ossnnotifications' => 'Notificari',
     'ossn:notifications:comments:post' => "%s a adaugat un comentariu la postarea ta .",
     'ossn:notifications:like:post' => "Lui %s i-a placut postarea ta.",
     'ossn:notifications:like:annotation' => "Lui %s i-a placut comentariul tau.",
@@ -35,5 +36,7 @@ $ro = array(
     'ossn:notification:mark:read:error' => 'Nu am putut marca mesajele ca fiind citite',
     
     'ossn:notifications:mark:as:read' => 'Marcheaza mesajele ca fiind citite',
+	'ossn:notifications:admin:settings:close_anywhere:title' => 'Închideți ferestrele de notificare făcând clic oriunde',
+	'ossn:notifications:admin:settings:close_anywhere:note' => '<i class="fa fa-info-circle"></i> închide orice fereastră de notificare făcând clic oriunde pe pagină<br><br>',
 );
 ossn_register_languages('ro', $ro); 

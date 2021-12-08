@@ -2,9 +2,9 @@
 /**
  * Open Source Social Network
  *
- * @package Open Source Social Network
- * @author    Open Social Website Core Team <info@softlab24.com>
- * @copyright 2014-2017 SOFTLAB24 LIMITED
+ * @package   Open Source Social Network
+ * @author    Open Social Website Core Team <info@openteknik.com>
+ * @copyright (C) OpenTeknik LLC
  * @license   Open Source Social Network License (OSSN LICENSE)  http://www.opensource-socialnetwork.org/licence
  * @link      https://www.opensource-socialnetwork.org/
  */
@@ -25,16 +25,18 @@ function ossn_groups() {
 		ossn_extend_view('css/ossn.default', 'css/groups');
 		
 		//group js
-		ossn_extend_view('js/opensource.socialnetwork', 'js/groups');
+		ossn_extend_view('js/ossn.site', 'js/groups');
 		
 		//group pages
 		ossn_register_page('group', 'ossn_group_page');
 		ossn_register_page('groups', 'ossn_groups_page');
+		ossn_group_subpage('about');
 		ossn_group_subpage('members');
 		ossn_group_subpage('edit');
 		ossn_group_subpage('requests');
 		
 		//group hooks
+		ossn_add_hook('group', 'subpage', 'group_about_page');
 		ossn_add_hook('group', 'subpage', 'group_members_page');
 		ossn_add_hook('group', 'subpage', 'group_edit_page');
 		ossn_add_hook('group', 'subpage', 'group_requests_page');
@@ -50,12 +52,14 @@ function ossn_groups() {
 				ossn_register_action('group/edit', __OSSN_GROUPS__ . 'actions/group/edit.php');
 				ossn_register_action('group/join', __OSSN_GROUPS__ . 'actions/group/join.php');
 				ossn_register_action('group/delete', __OSSN_GROUPS__ . 'actions/group/delete.php');
+				ossn_register_action('group/change_owner', __OSSN_GROUPS__ . 'actions/group/change_owner.php');
 				ossn_register_action('group/member/approve', __OSSN_GROUPS__ . 'actions/group/member/request/approve.php');
 				ossn_register_action('group/member/cancel', __OSSN_GROUPS__ . 'actions/group/member/request/cancel.php');
 				ossn_register_action('group/member/decline', __OSSN_GROUPS__ . 'actions/group/member/request/decline.php');
 				
 				ossn_register_action('group/cover/upload', __OSSN_GROUPS__ . 'actions/group/cover/upload.php');
 				ossn_register_action('group/cover/reposition', __OSSN_GROUPS__ . 'actions/group/cover/reposition.php');
+				ossn_register_action('group/cover/delete', __OSSN_GROUPS__ . 'actions/group/cover/delete.php');
 		}
 		
 		
@@ -94,8 +98,8 @@ function ossn_groups() {
 				'text' => ossn_print('groups'),
 				'url' => ossn_site_url('search?type=groups&q='),
 				'parent' => 'groups',
-				'icon' => true,
-		));		
+				'icon' => true
+		));
 		//my groups link
 		/* ossn_register_sections_menu('newsfeed', array(
 		'text' => 'My Groups',
@@ -113,13 +117,15 @@ function ossn_groups() {
  * @access private
  */
 function groups_search_handler($hook, $type, $return, $params) {
-		$Pagination = new OssnPagination;
-		$groups     = new OssnGroup;
-		$data       = $groups->searchGroups($params['q']);
-		$Pagination->setItem($data);
-		$group['groups'] = $Pagination->getItem();
+		$groups = new OssnGroup;
+		$data   = $groups->searchGroups($params['q']);
+		$count  = $groups->searchGroups($params['q'], array(
+				'count' => true
+		));
+		
+		$group['groups'] = $data;
 		$search          = ossn_plugin_view('groups/search/view', $group);
-		$search .= $Pagination->pagination();
+		$search .= ossn_view_pagination($count);
 		if(empty($data)) {
 				return ossn_print('ossn:search:no:result');
 		}
@@ -135,7 +141,15 @@ function groups_search_handler($hook, $type, $return, $params) {
 function ossn_group_load_event($event, $type, $params) {
 		$owner = ossn_get_page_owner_guid();
 		$url   = ossn_site_url();
+		ossn_register_menu_link('about', 'about:group', ossn_group_url($owner) . 'about', 'groupheader');
 		ossn_register_menu_link('members', 'members', ossn_group_url($owner) . 'members', 'groupheader');
+		// show 'Requests' menu tab only on pending requests
+		$group = ossn_get_group_by_guid($owner);
+		if($group){
+			if ($group->countRequests() && ($group->owner_guid == ossn_loggedin_user()->guid || ossn_isAdminLoggedin() || $group->isModerator(ossn_loggedin_user()->guid))) {
+				ossn_register_menu_link('requests', 'requests', ossn_group_url($owner) . 'requests', 'groupheader');
+			}
+		}
 }
 
 /**
@@ -229,7 +243,7 @@ function ossn_group_page($pages) {
 		if(empty($pages[0])) {
 				ossn_error_page();
 		}
-		if(!empty($pages[0]) && !empty($pages[0])) {
+		if(!empty($pages[0])) {
 				if(isset($pages[1])) {
 						$params['subpage'] = $pages[1];
 				} else {
@@ -237,7 +251,7 @@ function ossn_group_page($pages) {
 				}
 				
 				if(!ossn_is_group_subapge($params['subpage']) && !empty($params['subpage'])) {
-						return false;
+						ossn_error_page();
 				}
 				$group = ossn_get_group_by_guid($pages[0]);
 				if(empty($group->guid)) {
@@ -250,9 +264,29 @@ function ossn_group_page($pages) {
 				$params['group']     = $group;
 				$title               = $group->title;
 				$view                = ossn_plugin_view('groups/pages/profile', $params);
-				$contents['content'] = ossn_group_layout($view);
-				$content             = ossn_set_page_layout('contents', $contents);
+				$content             = ossn_group_layout($view);
 				echo ossn_view_page($title, $content);
+		}
+}
+
+/**
+ * Group about page
+ *
+ * Page:
+ *      group/<guid>/about
+ *
+ * @return mixdata;
+ * @access private
+ */
+function group_about_page($hook, $type, $return, $params) {
+		$page = $params['subpage'];
+		if($page == 'about') {
+				$mod_content = ossn_plugin_view('groups/pages/about', $params);
+				$mod         = array(
+						'title' => ossn_print('about:group'),
+						'content' => $mod_content
+				);
+				echo ossn_set_page_layout('module', $mod);
 		}
 }
 
@@ -289,8 +323,10 @@ function group_members_page($hook, $type, $return, $params) {
 function group_edit_page($hook, $type, $return, $params) {
 		$page  = $params['subpage'];
 		$group = ossn_get_group_by_guid(ossn_get_page_owner_guid());
-		if($group->owner_guid !== ossn_loggedin_user()->guid && !ossn_isAdminLoggedin()) {
+		if(ossn_isLoggedin()){
+			if($group->owner_guid !== ossn_loggedin_user()->guid && !ossn_isAdminLoggedin()) {
 				return false;
+			}
 		}
 		if($page == 'edit') {
 				$params = array(
@@ -322,7 +358,7 @@ function group_requests_page($hook, $type, $return, $params) {
 		$page  = $params['subpage'];
 		$group = ossn_get_group_by_guid(ossn_get_page_owner_guid());
 		if($page == 'requests') {
-				if($group->owner_guid !== ossn_loggedin_user()->guid && !ossn_isAdminLoggedin()) {
+				if($group->owner_guid !== ossn_loggedin_user()->guid && !$group->isModerator(ossn_loggedin_user()->guid) && !ossn_isAdminLoggedin()) {
 						redirect("group/{$group->guid}");
 				}
 				$mod_content = ossn_plugin_view('groups/pages/requests', array(
@@ -347,7 +383,7 @@ function group_requests_page($hook, $type, $return, $params) {
  */
 function ossn_user_groups_delete($callback, $type, $params) {
 		$deleteGroup = new OssnGroup;
-		$groups      = $deleteGroup->getUserGroups($params['entity']->guid);
+		$groups      = $deleteGroup->getUserGroups($params['entity']->guid, array('page_limit' => false));
 		if($groups) {
 				foreach($groups as $group) {
 						$deleteGroup->deleteGroup($group->guid);

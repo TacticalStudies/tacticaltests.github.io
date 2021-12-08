@@ -2,9 +2,9 @@
 /**
  * Open Source Social Network
  *
- * @package   (softlab24.com).ossn
- * @author    OSSN Core Team <info@softlab24.com>
- * @copyright 2014-2017 SOFTLAB24 LIMITED
+ * @package   (openteknik.com).ossn
+ * @author    OSSN Core Team <info@openteknik.com>
+ * @copyright (C) OpenTeknik LLC
  * @license   Open Source Social Network License (OSSN LICENSE)  http://www.opensource-socialnetwork.org/licence
  * @link      https://www.opensource-socialnetwork.org/
  */
@@ -40,7 +40,7 @@ $englsih = array(
 	'all:files:required' => 'All files are required! Please check your files.',
 	
 	'ossn:install:php' => 'PHP ',
-	'ossn:install:old:php' => "You have an old version of PHP " . PHP_VERSION . " You need PHP 5.4 or PHP 5.5",
+	'ossn:install:old:php' => "You have an old version of PHP " . PHP_VERSION . " You need PHP 7.0 or 7.4",
 	
 	'ossn:install:mysqli' => 'MYSQLI ENABLED',
 	'ossn:install:mysqli:required' => 'MYSQLI PHP EXTENSION REQUIRED',
@@ -72,6 +72,7 @@ $englsih = array(
 	
 	'ossn:install:ziparchive' => 'PHP ZipArchive ENABLED',
 	'ossn:install:ziparchive:error' => 'PHP ZipArchive EXTENSION REQUIRED',
+	'ossn:install:cachedir:note:failed' => 'Make sure your files and directories are owned by correct apache user.',
 );
 
 ossn_installation_register_languages($englsih);

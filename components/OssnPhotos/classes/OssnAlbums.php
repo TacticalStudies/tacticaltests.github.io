@@ -2,9 +2,9 @@
 /**
  * Open Source Social Network
  *
- * @package   (softlab24.com).ossn
- * @author    OSSN Core Team <info@softlab24.com>
- * @copyright 2014-2017 SOFTLAB24 LIMITED
+ * @package   (openteknik.com).ossn
+ * @author    OSSN Core Team <info@openteknik.com>
+ * @copyright (C) OpenTeknik LLC
  * @license   Open Source Social Network License (OSSN LICENSE)  http://www.opensource-socialnetwork.org/licence
  * @link      https://www.opensource-socialnetwork.org/
  */
@@ -57,17 +57,21 @@ class OssnAlbums extends OssnObject {
 		 * Get albums by owner id and owner type
 		 *
 		 * @param integer $owner_id User guid who is creating album
-		 * @param string $type Album type (user, group, page etc)
+		 * @param array   $params Extra options,
 		 *
 		 * @return object
 		 */
-		public function GetAlbums($owner_id, $type = 'user') {
+		public function GetAlbums($owner_id, $params = array()) {
 				if(!empty($owner_id)) {
-						$this->owner_guid = $owner_id;
-						$this->type       = $type;
-						$this->subtype    = 'ossn:album';
-						return $this->getObjectByOwner();
+						$args = array(
+							'type' => 'user',
+							'subtype' => 'ossn:album',
+							'owner_guid' => $owner_id,
+						);
+						$vars = array_merge($args, $params);
+						return $this->searchObject($vars);
 				}
+				return false;
 		}
 		
 		/**
@@ -140,6 +144,30 @@ class OssnAlbums extends OssnObject {
 										foreach($album->photos as $photo) {
 												$photos->photoid = $photo->guid;
 												$photos->deleteAlbumPhoto();
+										}
+								}
+								if(class_exists('OssnWall')) {
+										$wall      = new OssnWall();
+										$wallposts = $wall->searchObject(array(
+												'type' => 'user',
+												'page_limit' => false,
+												'entities_pairs' => array(
+														array(
+																'name' => 'item_type',
+																'value' => 'album:photos:wall'
+														),
+														array(
+																'name' => 'item_guid',
+																'value' => $guid
+														)
+												)
+										));
+										if($wallposts) {
+												foreach($wallposts as $post) {
+														if(!empty($post->guid)) {
+																$post->deletePost($post->guid);
+														}
+												}
 										}
 								}
 								if($album->album->deleteObject()) {

@@ -2,9 +2,9 @@
 /**
  * Open Source Social Network
  *
- * @package   (softlab24.com).ossn
- * @author    OSSN Core Team <info@softlab24.com>
- * @copyright 2014-2017 SOFTLAB24 LIMITED
+ * @package   (openteknik.com).ossn
+ * @author    OSSN Core Team <info@openteknik.com>
+ * @copyright (C) OpenTeknik LLC
  * @license   Open Source Social Network License (OSSN LICENSE)  http://www.opensource-socialnetwork.org/licence
  * @link      https://www.opensource-socialnetwork.org/
  */
@@ -243,18 +243,20 @@ function update_last_activity() {
  * @return bool
  */
 function ossn_user_friendly_time($tm, $rcs = 0) {
+		$passedtime = ossn_print('site:timepassed:data');
+		$pds        = explode('|', $passedtime);
+		if(!$pds || $pds && count($pds) < 2) {
+			return;
+		}
+		if(count($pds) == 2) {
+			// Option 1: display explicit time and use formatting string
+			// using strftime, we can even get localized months
+			setlocale(LC_TIME, $pds[1]);
+			return strftime($pds[0], $tm);
+		}
+		// Option 2: display elapsed time (Ossn default)
 		$cur_tm     = time();
 		$dif        = $cur_tm - $tm;
-		// get language dependend items for display
-		$passedtime = ossn_print('site:timepassed:data');
-		// put them into array
-		// 0  = second
-		// 15 = decades
-		$pds        = explode('|', $passedtime);
-		
-		// BETTER DO explode ONLY ONCE on start and when language changes
-		// and get already prepared array from there
-		// don't know how and where to do this correctly ?!?
 		$lngh = array(
 				1,
 				60,
@@ -281,7 +283,7 @@ function ossn_user_friendly_time($tm, $rcs = 0) {
 		$x = $no . ' ' . $pds[$v];
 		if(($rcs > 0) && ($v >= 1))
 				$x .= ' ' . ossn_user_friendly_time($_tm, $rcs - 1);
-		return ossn_print('site:timepassed:text', $x);
+		return ossn_print('site:timepassed:text', array($x));
 }
 
 /**
@@ -305,7 +307,8 @@ function ossn_uservalidate_pagehandler($pages) {
 										ossn_trigger_message(ossn_print('user:account:validated'), 'success');
 										redirect();
 								} else {
-										ossn_trigger_message(ossn_print('user:account:validate:fail'), 'success');
+										//Shows a red warning if can not validate email address #1481
+										ossn_trigger_message(ossn_print('user:account:validate:fail'), 'error');
 										redirect();
 								}
 						}
@@ -338,7 +341,7 @@ function ossn_site_user_lang_code($hook, $type, $return, $params) {
  * @return boolean
  */
 function ossn_logout() {
-	OssnUser::Logout();
+		OssnUser::Logout();
 }
 /**
  * Ossn default user fields
@@ -367,6 +370,38 @@ function ossn_default_user_fields() {
 				)
 		);
 		return ossn_call_hook('user', 'default:fields', false, $fields);
+}
+/**
+ * Missing logic for not required fields on registration form #1421
+ *
+ * Add a class for required/non-required fields 
+ *
+ * @return array
+ */
+function ossn_user_fields_set_nonrequired($hook, $type, $fields, $params){
+		if(isset($fields['non_required'])){
+				foreach($fields['non_required'] as $ftype => $types){
+						foreach($types as $key => $field){
+								$class = '';
+								if(isset($fields['non_required'][$ftype][$key]['class'])){
+									$class = $fields['non_required'][$ftype][$key]['class'];
+								}
+								$fields['non_required'][$ftype][$key]['class'] = trim($class.' ossn-field-not-required');
+						}
+				}
+		}
+		if(isset($fields['required'])){
+				foreach($fields['required'] as $ftype => $types){
+						foreach($types as $key => $field){
+								$class = '';
+								if(isset($fields['required'][$ftype][$key]['class'])){
+									$class = $fields['required'][$ftype][$key]['class'];
+								}
+								$fields['required'][$ftype][$key]['class'] = trim($class.' ossn-field-required');
+						}
+				}
+		}		
+		return $fields;
 }
 /**
  * Ossn prepare user fields
@@ -438,5 +473,22 @@ function ossn_remove_field_from_fields(array $remove = array(), array $fields = 
 		}
 		return $fields;
 }
+/**
+ * List all the admin users
+ *
+ * @return array|boolean
+ */
+function ossn_get_admin_users() {
+		$user = new OssnUser;
+		$list = $user->searchUsers(array(
+				'wheres' => 'u.type="admin"',
+				'page_limit' => false
+		));
+		if($list) {
+				return $list;
+		}
+		return false;
+}
 ossn_register_callback('ossn', 'init', 'ossn_users');
 ossn_add_hook('load:settings', 'language', 'ossn_site_user_lang_code');
+ossn_add_hook('user', 'default:fields','ossn_user_fields_set_nonrequired', 201);

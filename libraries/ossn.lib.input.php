@@ -2,9 +2,9 @@
 /**
  * Open Source Social Network
  *
- * @package Open Source Social Network
- * @author    Open Social Website Core Team <info@softlab24.com>
- * @copyright 2014-2017 SOFTLAB24 LIMITED
+ * @package   Open Source Social Network
+ * @author    Open Social Website Core Team <info@openteknik.com>
+ * @copyright (C) OpenTeknik LLC
  * @license   Open Source Social Network License (OSSN LICENSE)  http://www.opensource-socialnetwork.org/licence
  * @link      https://www.opensource-socialnetwork.org/
  */
@@ -88,12 +88,22 @@ function ossn_emojis_to_entites($content) {
  */
 function input($input, $noencode = '', $default = false, $strip = true) {
 		$str  = false;
+		//#1230 breaks when array is input #1474
+		if(isset($_REQUEST[$input]) && !is_array($_REQUEST[$input])){
+			$data_hook = ((strlen($_REQUEST[$input]) > 0) ? preg_replace('/\x20+/', ' ', $_REQUEST[$input]) : null);
+		} else {
+			if(!empty($_REQUEST[$input])){
+				$data_hook = preg_replace('/\x20+/', ' ', $_REQUEST[$input]); 	
+			} else {
+				$data_hook = null;	
+			}
+		}
 		$hook = ossn_call_hook('ossn', 'input', false, array(
 				'input' => $input,
 				'noencode' => $noencode,
 				'default' => $default,
 				'strip' => $strip,
-				'data' => ((strlen($_REQUEST[$input]) > 0) ? preg_replace('/\x20+/', ' ', $_REQUEST[$input]) : null),
+				'data' => $data_hook,
 		));
 		if ($hook) {
 				$input    = $hook['input'];

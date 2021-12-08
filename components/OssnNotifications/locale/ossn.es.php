@@ -4,14 +4,15 @@
  *
  * Translated by Zaturnay - https://zaturnay.com.ve
  *
- * @package   (softlab24.com).ossn
- * @author    OSSN Core Team <info@softlab24.com>
- * @copyright 2014-2017 SOFTLAB24 LIMITED
+ * @package   (openteknik.com).ossn
+ * @author    OSSN Core Team <info@openteknik.com>
+ * @copyright (C) OpenTeknik LLC
  * @license   Open Source Social Network License (OSSN LICENSE)  http://www.opensource-socialnetwork.org/licence
  * @link      https://www.opensource-socialnetwork.org/
  */
 
 $es = array(
+	'ossnnotifications' => 'Notificaciones',
     'ossn:notifications:comments:post' => "%s comentó en el post.",
     'ossn:notifications:like:post' => "%s me ha gustado tu publicación.",
     'ossn:notifications:like:annotation' => "%s me gustó tu comentario",
@@ -38,5 +39,7 @@ $es = array(
     'ossn:notification:mark:read:error' => 'No se puede marcar todo como leído',
     
     'ossn:notifications:mark:as:read' => 'Marcar todo como leido',
+	'ossn:notifications:admin:settings:close_anywhere:title' => 'Cierre las ventanas de notificación haciendo clic en cualquier lugar',
+	'ossn:notifications:admin:settings:close_anywhere:note' => '<i class="fa fa-info-circle"></i> cierra cualquier ventana de notificación haciendo clic en cualquier lugar de la página<br><br>',
 );
 ossn_register_languages('es', $es); 

@@ -1,10 +1,10 @@
 /**
 * Open Source Social Network
 *
-* @package   (softlab24.com).ossn
+* @package   (openteknik.com).ossn
 * @author    OSSN Core Team
 <info@opensource-socialnetwork.org>
-* @copyright 2014-2017 SOFTLAB24 LIMITED
+* @copyright (C) OpenTeknik LLC
 * @license   Open Source Social Network License (OSSN LICENSE)  http://www.opensource-socialnetwork.org/licence
 * @link      https://www.opensource-socialnetwork.org/
 */
@@ -12,9 +12,9 @@
 /**
  * Open Source Social Network
  *
- * @package Open Source Social Network
- * @author    Open Social Website Core Team <info@softlab24.com>
- * @copyright 2014-2017 SOFTLAB24 LIMITED
+ * @package   Open Source Social Network
+ * @author    Open Social Website Core Team <info@openteknik.com>
+ * @copyright (C) OpenTeknik LLC
  * @license   Open Source Social Network License (OSSN LICENSE)  http://www.opensource-socialnetwork.org/licence
  * @link      https://www.opensource-socialnetwork.org/
  */
@@ -37,12 +37,14 @@ if($active_sessions) {
 										$vars['message'] = $message->message;
 										$vars['time']    = $message->time;
 										$vars['id']      = $message->id;
+										$vars['instance'] = (clone $message);
 										$messageitem     = ossn_plugin_view('chat/message-item-send', $vars);
 								} else {
 										$vars['reciever'] = ossn_user_by_guid($message->message_from);
 										$vars['message']  = $message->message;
 										$vars['time']     = $message->time;
 										$vars['id']       = $message->id;
+										$vars['instance'] = (clone $message);
 										$messageitem      = ossn_plugin_view('chat/message-item-received', $vars);
 								}
 								$total          = get_object_vars($messages);
@@ -65,7 +67,7 @@ if($active_sessions) {
 				);
 		}
 }
-if($new_messages){
+if(isset($new_messages)){
 	foreach($new_messages as $item) {
 		$messages_items[$item['fid']][] = array(
 				'id' => $item['id'],
@@ -75,7 +77,8 @@ if($new_messages){
 		);
 	}
 }
-if($messages_items){
+$messages_combined = array();
+if(isset($messages_items)){
 	foreach($messages_items as $key => $mitem) {
 		$messages_combined[] = array(
 				'message' => $mitem,
@@ -129,14 +132,19 @@ $.each(OssnChat['active_friends'], function(key, data){
  * @params OssnChat['active_friends'] Array
  */	
 if(OssnChat['allfriends']){
-  $.each(OssnChat['allfriends'], function(key, data){
-       var $item  = $(".ossn-chat-windows-long .inner").find('#friend-list-item-'+data['guid']);
-       if($item.length){
+	$.each(OssnChat['allfriends'], function(key, data){
+        	var $item  = $(".ossn-chat-windows-long .inner").find('#friend-list-item-'+data['guid']);
+       		if($item.length){
 			if (data['status'] == 'ossn-chat-icon-online' && $item.find('.ustatus').hasClass('ossn-chat-icon-online') == false) {
 				/* state change offline -> online: move friend to top of list */
 				$item.remove();
-				var prependata = '<div data-toggle="tooltip" title="'+data['name']+'" class="friends-list-item" id="friend-list-item-'+data['guid']+'" onClick="Ossn.ChatnewTab('+data['guid']+');"><div class="friends-item-inner"><div class="icon"><img class="ustatus ossn-chat-icon-online" src="'+data['icon']+'" /></div></div></div>';    
-				$(".ossn-chat-windows-long .inner").prepend(prependata);
+				var prependata = '<div data-toggle="tooltip" title="'+data['name']+'" class="friends-list-item" id="friend-list-item-'+data['guid']+'" onClick="Ossn.ChatnewTab('+data['guid']+');"><div class="friends-item-inner"><div class="icon"><img class="ustatus ossn-chat-icon-online" src="'+data['icon']+'" /></div></div></div>';  
+				if ($('.ossn-chat-pling').length) {
+					$(".ossn-chat-windows-long .inner .ossn-chat-pling").after(prependata);
+				}
+				else {
+					$(".ossn-chat-windows-long .inner").prepend(prependata);
+				}
 			}
 			if (data['status'] == '0' && $item.find('.ustatus').hasClass('ossn-chat-icon-online') == true) {
 				/* state change online -> offline: move friend to bottom of list */
@@ -144,13 +152,14 @@ if(OssnChat['allfriends']){
 				var appendata = '<div data-toggle="tooltip" title="'+data['name']+'" class="friends-list-item" id="friend-list-item-'+data['guid']+'" onClick="Ossn.ChatnewTab('+data['guid']+');"><div class="friends-item-inner"><div class="icon"><img class="ustatus" src="'+data['icon']+'" /></div></div></div>';    
 				$(".ossn-chat-windows-long .inner").append(appendata);
 			}
-        } 
-        if($item.length == 0){
+        	} 
+        	else {
+			/* build initial list */
 			var appendata = '<div data-toggle="tooltip" title="'+data['name']+'" class="friends-list-item" id="friend-list-item-'+data['guid']+'" onClick="Ossn.ChatnewTab('+data['guid']+');"><div class="friends-item-inner"><div class="icon"><img class="ustatus '+data['status']+'" src="'+data['icon']+'" /></div></div></div>';    
-         	$(".ossn-chat-windows-long .inner").find('.ossn-chat-none').hide();
-          	$(".ossn-chat-windows-long .inner").append(appendata);
-        }
-  });
+         		$(".ossn-chat-windows-long .inner").find('.ossn-chat-none').hide();
+			$(".ossn-chat-windows-long .inner").append(appendata);
+        	}
+  	});
 	$('[data-toggle="tooltip"]').tooltip({
 		placement:'left',										  
 	});   
@@ -188,7 +197,7 @@ $.each(OssnChat['newmessages'], function(key, data){
                            
                            //chat linefeed problem #278.
                            // move scroll once again when div is loaded fully
-                           $("#ossn-chat-messages-data-"+data['fid']).load(function() {
+                           $("#ossn-chat-messages-data-"+data['fid']).on('load', function() {
                            		Ossn.ChatScrollMove(data['fid']);
                            });
 
@@ -204,10 +213,10 @@ $.each(OssnChat['newmessages'], function(key, data){
  */	
 if(OssnChat['all_new']){
 $.each(OssnChat['all_new'], function(key, data){
-     if($(".ossn-chat-containers").children(".friend-tab-item").size() < 4){   						   
+     if($(".ossn-chat-containers").children(".friend-tab-item").length < 4){   						   
          var $friend = data['message_from'];
          Ossn.ChatnewTab($friend);         
-           if(!$('#ftab-i'+$user)){   						     
+           if(!$('#ftab-i'+$friend)){   						     
               Ossn.ChatplaySound();
               Ossn.ChatScrollMove(data['message_from']);
            }

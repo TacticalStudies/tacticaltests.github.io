@@ -1,81 +1,26 @@
+//<script>
 /**
  * Open Source Social Network
  *
- * @package   (softlab24.com).ossn
- * @author    OSSN Core Team <info@softlab24.com>
- * @copyright 2014-2017 SOFTLAB24 LIMITED
+ * @package   (openteknik.com).ossn
+ * @author    OSSN Core Team <info@openteknik.com>
+ * @copyright (C) OpenTeknik LLC
  * @license   Open Source Social Network License (OSSN LICENSE)  http://www.opensource-socialnetwork.org/licence
  * @link      https://www.opensource-socialnetwork.org/
  */
-//<script>
 Ossn.RegisterStartupFunction(function() {
 	$(document).ready(function() {
-		var cYear = (new Date).getFullYear();
-		var alldays = Ossn.Print('datepicker:days');
-		var shortdays = alldays.split(",");
-		var allmonths = Ossn.Print('datepicker:months');
-		var shortmonths = allmonths.split(",");
-
-		var datepick_args = {
-			changeMonth: true,
-			changeYear: true,
-			dateFormat: 'dd/mm/yy',
-			yearRange: '1950:' + cYear,
-		};
-
-		if (Ossn.isLangString('datepicker:days')) {
-			datepick_args['dayNamesMin'] = shortdays;
-		}
-		if (Ossn.isLangString('datepicker:months')) {
-			datepick_args['monthNamesShort'] = shortmonths;
-		}
-		$("input[name='birthdate']").datepicker(datepick_args);
-
 		/**
 		 * Reposition cover
 		 */
-		$('#reposition-cover').click(function() {
+		$('#reposition-profile-cover').on('click', function() {
 			$('#profile-menu').hide();
 			$('#cover-menu').show();
-			$(function() {
-				$.globalVars = {
-					originalTop: 0,
-					originalLeft: 0,
-					maxHeight: $("#draggable").height() - $("#container").height(),
-					maxWidth: $("#draggable").width() - $("#container").width()
-				};
-				$("#draggable").draggable({
-					start: function(event, ui) {
-						if (ui.position != undefined) {
-							$.globalVars.originalTop = ui.position.top;
-							$.globalVars.originalLeft = ui.position.left;
-						}
-					},
-					drag: function(event, ui) {
-						var newTop = ui.position.top;
-						var newLeft = ui.position.left;
-						if (ui.position.top < 0 && ui.position.top * -1 > $.globalVars.maxHeight) {
-							newTop = $.globalVars.maxHeight * -1;
-						}
-						if (ui.position.top > 0) {
-							newTop = 0;
-						}
-						if (ui.position.left < 0 && ui.position.left * -1 > $.globalVars.maxWidth) {
-							newLeft = $.globalVars.maxWidth * -1;
-						}
-						if (ui.position.left > 0) {
-							newLeft = 0;
-						}
-						ui.position.top = newTop;
-						ui.position.left = newLeft;
-
-						Ossn.ProfileCover_top = newTop;
-						Ossn.ProfileCover_left = newLeft;
-					}
-				});
-			});
+			$('.profile-cover-controls').hide();
+			$('.profile-cover').unbind('mouseenter').unbind('mouseleave');
+			Ossn.Drag();
 		});
-		$("#upload-photo").submit(function(event) {
+		$("#upload-photo").on('submit', function(event) {
 			event.preventDefault();
 			var formData = new FormData($(this)[0]);
 			var $url = Ossn.site_url + 'action/profile/photo/upload';
@@ -108,9 +53,9 @@ Ossn.RegisterStartupFunction(function() {
 			return false;
 		});
 
-		$("#upload-cover").submit(function(event) {
+		$("#upload-cover").on('submit', function(event) {
 			event.preventDefault();
-			console.log('no');
+			//console.log('no');
 			var formData = new FormData($(this)[0]);
 			var $url = Ossn.site_url + 'action/profile/cover/upload';
 			var fileInput = $('#upload-cover').find("input[type=file]")[0],
@@ -118,7 +63,6 @@ Ossn.RegisterStartupFunction(function() {
 
 			if (file) {
 				var img = new Image();
-
 				img.src = window.URL.createObjectURL(file);
 
 				img.onload = function() {
@@ -126,7 +70,7 @@ Ossn.RegisterStartupFunction(function() {
 						height = img.naturalHeight;
 
 					window.URL.revokeObjectURL(img.src);
-					if (width < 850 || height < 300) {
+					if (width < 1040 || height < 300) {
 						Ossn.trigger_message(Ossn.Print('profile:cover:err1:detail'), 'error');
 						return false;
 					} else {
@@ -139,6 +83,7 @@ Ossn.RegisterStartupFunction(function() {
 							contentType: false,
 							processData: false,
 							beforeSend: function(xhr, obj) {
+								$('.profile-cover').prepend('<div class="ossn-covers-uploading-annimation"> <div class="ossn-loading"></div></div>');
 								$('.profile-cover-img').attr('class', 'user-cover-uploading');
 							},
 							success: function(callback) {
@@ -148,6 +93,8 @@ Ossn.RegisterStartupFunction(function() {
 								$imageurl = $('.profile-cover').find('img').attr('src') + '?' + $time;
 								$('.profile-cover').find('img').attr('src', $imageurl);
 								$('.profile-cover').find('img').attr('style', '');
+								$('.profile-cover').find('img').show();
+								$('.ossn-covers-uploading-annimation').remove();
 							},
 						});
 					}
@@ -180,13 +127,46 @@ Ossn.repositionCOVER = function() {
 		data: '&top=' + $pcover_top + '&left=' + $pcover_left,
 		url: Ossn.AddTokenToUrl($url),
 		success: function(callback) {
+			$("#draggable").draggable('destroy');
 			$('#profile-menu').show();
 			$('#cover-menu').hide();
-			$("#draggable").draggable({
-				drag: function() {
-					return false;
-				}
+			
+			$('.profile-cover').on('mouseenter', function(){
+				$('.profile-cover-controls').show();
 			});
+			$('.profile-cover').on('mouseleave', function(){
+				$('.profile-cover-controls').hide();
+			});					
 		},
 	});
 };
+/**
+ * Setup a profile photo buttons
+ *
+ * @return void
+ */
+Ossn.RegisterStartupFunction(function() {
+	$(document).ready(function() {
+		$('.profile-photo').on('mouseenter', function(){
+				$('.upload-photo').slideDown();
+		});
+		$('.profile-photo').on('mouseleave', function(){
+			$('.upload-photo').slideUp();
+		});		
+	});
+});
+/**
+ * Setup a profile cover buttons
+ *
+ * @return void
+ */
+Ossn.RegisterStartupFunction(function() {
+	$(document).ready(function() {
+			$('.profile-cover').on('mouseenter', function(){
+				$('.profile-cover-controls').show();
+			});
+			$('.profile-cover').on('mouseleave', function(){
+				$('.profile-cover-controls').hide();
+			});		
+	});
+});
